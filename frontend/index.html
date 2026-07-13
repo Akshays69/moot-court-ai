@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moot Court AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app">
+
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="mode-tabs">
+                    <button class="mode-tab active" id="judgeTab" onclick="switchMode('judge')">⚖️ Judge</button>
+                    <button class="mode-tab" id="lawyerTab" onclick="switchMode('lawyer')">⚔️ Lawyer</button>
+                </div>
+            </div>
+            <div class="chat-list" id="chat-list"></div>
+            <div class="sidebar-footer">
+                <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="main-header">
+                <h1>Moot Court AI</h1>
+                <p id="mode-label">Judge Mode</p>
+                <button class="evaluate-btn" onclick="evaluateSession()">Evaluate Session</button>
+            </div>
+
+            <div class="setup-panel" id="setup-panel">
+                <div class="setup-title">Configure your session</div>
+
+                <div class="setup-row">
+                    <label>Legal Domain</label>
+                    <select id="domainSelect">
+                        <option value="Constitutional Law">Constitutional Law · CON</option>
+                        <option value="Criminal Law">Criminal Law · CRL</option>
+                        <option value="Commercial Law">Commercial Law · COM</option>
+                        <option value="Intellectual Property">Intellectual Property · IPR</option>
+                        <option value="Family Law">Family Law · FAM</option>
+                        <option value="Environmental Law">Environmental Law · ENV</option>
+                    </select>
+                </div>
+                <div class="setup-row">
+                    <label>Your Side</label>
+                    <div class="side-buttons">
+                        <button class="side-btn active" id="petitionerBtn"
+                            onclick="selectSide('petitioner')">Petitioner</button>
+                        <button class="side-btn" id="respondentBtn"
+                            onclick="selectSide('respondent')">Respondent</button>
+                    </div>
+                </div>
+
+                <div class="setup-row">
+                    <label>Moot Problem</label>
+                    <div class="problem-options">
+                        <button class="problem-btn" onclick="generateProblem()">🎲 Generate a Problem</button>
+                        <span class="or-text">or</span>
+                        <textarea id="custom-problem" placeholder="Paste your own moot problem here..."></textarea>
+                    </div>
+                </div>
+
+                <div class="problem-display" id="problem-display"></div>
+
+                <button class="start-btn" onclick="startSession()">Start Session →</button>
+            </div>
+
+            <div class="chat-window" id="chat-window" style="display:none"></div>
+
+            <div class="input-area" id="input-area" style="display:none">
+                <input type="text" id="user-input" placeholder="Type your argument..." />
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+
+    </div>
+    <div class="popup-overlay" id="popup-overlay" onclick="closePopup()">
+        <div class="popup" onclick="event.stopPropagation()">
+            <div class="popup-header">
+                <div>
+                    <p class="popup-title">Evaluation report</p>
+                    <p class="popup-subtitle" id="popup-chat-name"></p>
+                </div>
+                <button class="popup-close" onclick="closePopup()">✕</button>
+            </div>
+            <div class="popup-scores" id="popup-scores"></div>
+            <div class="popup-overall" id="popup-overall"></div>
+            <div class="popup-improvements" id="popup-improvements"></div>
+            <div class="popup-footer">
+                <button onclick="closePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
