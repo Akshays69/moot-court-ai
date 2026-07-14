@@ -87,7 +87,7 @@ async function generateProblem() {
     btn.innerText = '⏳ Generating...';
     btn.disabled = true;
 
-    const response = await fetch('http://127.0.0.1:8000/generate-problem', {
+    const response = await fetch('https://moot-court-ai-backend.onrender.com/generate-problem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ domain: currentDomain, side: currentSide })
@@ -178,7 +178,7 @@ function startSession() {
         saveMessage('Case', problem);
     }
 
-    fetch('http://127.0.0.1:8000/reset', {
+    fetch('https://moot-court-ai-backend.onrender.com/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     });
@@ -196,7 +196,7 @@ function startNewChat() {
     showSetupPanel();
     renderSidebar();
 
-    fetch('http://127.0.0.1:8000/reset', {
+    fetch('https://moot-court-ai-backend.onrender.com/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     });
@@ -248,7 +248,7 @@ function loadChat(id) {
     showChatPanel();
     renderSidebar();
 
-    fetch('http://127.0.0.1:8000/reset', {
+    fetch('https://moot-court-ai-backend.onrender.com/reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     });
@@ -308,7 +308,7 @@ async function sendMessage() {
     appendMessageToWindow('You', message, 'user-message');
     saveMessage('You', message);
 
-    const response = await fetch('http://127.0.0.1:8000/chat', {
+    const response = await fetch('https://moot-court-ai-backend.onrender.com/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -332,7 +332,7 @@ async function evaluateSession() {
         return;
     }
 
-    const response = await fetch('http://127.0.0.1:8000/evaluate', {
+    const response = await fetch('https://moot-court-ai-backend.onrender.com/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
     });
