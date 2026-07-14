@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moot Court AI — Login</title>
+    <link rel="stylesheet" href="login.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <div class="login-app">
+
+        <div class="login-left">
+            <div class="login-brand">
+                <div class="brand-icon">⚖</div>
+                <p class="brand-name">Moot Court AI</p>
+            </div>
+            <div class="login-hero">
+                <h1 class="hero-title">Practice like a<br><span class="gradient-text">real courtroom</span></h1>
+                <p class="hero-sub">AI-powered moot court practice partner for law students. Argue against a strict
+                    judge or tough opposing counsel — anytime, anywhere.</p>
+                <div class="hero-features">
+                    <div class="feature-item">⚖️ <span>AI Judge Mode</span></div>
+                    <div class="feature-item">⚔️ <span>Opposing Counsel Mode</span></div>
+                    <div class="feature-item">📊 <span>Performance Evaluation</span></div>
+                    <div class="feature-item">🏛️ <span>6 Legal Domains</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <div class="login-card">
+                <h2 class="login-title">Welcome back</h2>
+                <p class="login-sub">Sign in to continue your practice</p>
+
+                <div id="google-btn-container">
+                    <div id="g_id_onload"
+                        data-client_id="371872045613-e7lhqb2r1tmpb3mvdds131o0sgh9irkh.apps.googleusercontent.com"
+                        data-callback="handleGoogleLogin" data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black"
+                        data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left" data-width="340">
+                    </div>
+                </div>
+
+                <div class="divider-row">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">or</span>
+                    <div class="divider-line"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="you@example.com" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" />
+                </div>
+
+                <div id="login-error" class="error-msg" style="display:none"></div>
+
+                <button class="login-btn" onclick="handleEmailLogin()">Sign In</button>
+
+                <div class="register-row">
+                    <span>Don't have an account?</span>
+                    <button class="register-link" onclick="showRegister()">Register</button>
+                </div>
+            </div>
+
+            <div class="login-card" id="register-card" style="display:none">
+                <h2 class="login-title">Create account</h2>
+                <p class="login-sub">Start your moot court journey</p>
+
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="reg-name" class="form-input" placeholder="Your full name" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="reg-email" class="form-input" placeholder="you@example.com" />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="reg-password" class="form-input" placeholder="Min 6 characters" />
+                </div>
+
+                <div id="register-error" class="error-msg" style="display:none"></div>
+
+                <button class="login-btn" onclick="handleRegister()">Create Account</button>
+
+                <div class="register-row">
+                    <span>Already have an account?</span>
+                    <button class="register-link" onclick="showLogin()">Sign In</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="login.js"></script>
+</body>
+
+</html>

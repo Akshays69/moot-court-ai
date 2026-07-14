@@ -12,77 +12,148 @@
     <div class="app">
 
         <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="mode-tabs">
-                    <button class="mode-tab active" id="judgeTab" onclick="switchMode('judge')">⚖️ Judge</button>
-                    <button class="mode-tab" id="lawyerTab" onclick="switchMode('lawyer')">⚔️ Lawyer</button>
+            <div class="sidebar-brand">
+                <div class="brand-icon">⚖</div>
+                <div>
+                    <p class="brand-name">Moot Court AI</p>
+                    <p class="brand-sub">Practice Partner</p>
                 </div>
             </div>
+
+            <div class="mode-tabs">
+                <button class="mode-tab active" id="judgeTab" onclick="switchMode('judge')">
+                    <span>⚖️</span> Judge
+                </button>
+                <button class="mode-tab" id="lawyerTab" onclick="switchMode('lawyer')">
+                    <span>⚔️</span> Lawyer
+                </button>
+            </div>
+
+            <div class="sidebar-section-label">Sessions</div>
             <div class="chat-list" id="chat-list"></div>
+
             <div class="sidebar-footer">
-                <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
+                <button class="new-chat-btn" onclick="startNewChat()">+ New Session</button>
             </div>
         </div>
 
         <div class="main">
             <div class="main-header">
-                <h1>Moot Court AI</h1>
-                <p id="mode-label">Judge Mode</p>
-                <button class="evaluate-btn" onclick="evaluateSession()">Evaluate Session</button>
+                <div class="header-left">
+                    <p class="header-mode" id="mode-label">Judge Mode</p>
+                    <p class="header-domain" id="header-domain">Select a domain to begin</p>
+                </div>
+                <div class="header-right">
+                    <button class="evaluate-btn" onclick="evaluateSession()">📊 Evaluate Session</button>
+                    <div class="user-pill" id="user-pill"></div>
+                    <button class="logout-btn" onclick="logout()">↩ Logout</button>
+                </div>
             </div>
 
             <div class="setup-panel" id="setup-panel">
-                <div class="setup-title">Configure your session</div>
+                <div class="setup-card">
+                    <div class="setup-card-title">Configure your session</div>
 
-                <div class="setup-row">
-                    <label>Legal Domain</label>
-                    <select id="domainSelect">
-                        <option value="Constitutional Law">Constitutional Law · CON</option>
-                        <option value="Criminal Law">Criminal Law · CRL</option>
-                        <option value="Commercial Law">Commercial Law · COM</option>
-                        <option value="Intellectual Property">Intellectual Property · IPR</option>
-                        <option value="Family Law">Family Law · FAM</option>
-                        <option value="Environmental Law">Environmental Law · ENV</option>
-                    </select>
-                </div>
-                <div class="setup-row">
-                    <label>Your Side</label>
-                    <div class="side-buttons">
-                        <button class="side-btn active" id="petitionerBtn"
-                            onclick="selectSide('petitioner')">Petitioner</button>
-                        <button class="side-btn" id="respondentBtn"
-                            onclick="selectSide('respondent')">Respondent</button>
+                    <div class="setup-row">
+                        <label class="setup-label">Legal Domain</label>
+                        <div class="domain-grid">
+                            <button class="domain-btn active" data-domain="Constitutional Law" data-code="CON"
+                                onclick="selectDomain(this)">
+                                <span class="domain-icon">🏛️</span>
+                                <span class="domain-name">Constitutional Law</span>
+                                <span class="domain-code">CON</span>
+                            </button>
+                            <button class="domain-btn" data-domain="Criminal Law" data-code="CRL"
+                                onclick="selectDomain(this)">
+                                <span class="domain-icon">🔒</span>
+                                <span class="domain-name">Criminal Law</span>
+                                <span class="domain-code">CRL</span>
+                            </button>
+                            <button class="domain-btn" data-domain="Commercial Law" data-code="COM"
+                                onclick="selectDomain(this)">
+                                <span class="domain-icon">💼</span>
+                                <span class="domain-name">Commercial Law</span>
+                                <span class="domain-code">COM</span>
+                            </button>
+                            <button class="domain-btn" data-domain="Intellectual Property" data-code="IPR"
+                                onclick="selectDomain(this)">
+                                <span class="domain-icon">💡</span>
+                                <span class="domain-name">Intellectual Property</span>
+                                <span class="domain-code">IPR</span>
+                            </button>
+                            <button class="domain-btn" data-domain="Family Law" data-code="FAM"
+                                onclick="selectDomain(this)">
+                                <span class="domain-icon">👨‍👩‍👧</span>
+                                <span class="domain-name">Family Law</span>
+                                <span class="domain-code">FAM</span>
+                            </button>
+                            <button class="domain-btn" data-domain="Environmental Law" data-code="ENV"
+                                onclick="selectDomain(this)">
+                                <span class="domain-icon">🌿</span>
+                                <span class="domain-name">Environmental Law</span>
+                                <span class="domain-code">ENV</span>
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <div class="setup-row">
-                    <label>Moot Problem</label>
-                    <div class="problem-options">
-                        <button class="problem-btn" onclick="generateProblem()">🎲 Generate a Problem</button>
-                        <span class="or-text">or</span>
-                        <textarea id="custom-problem" placeholder="Paste your own moot problem here..."></textarea>
+                    <div class="setup-row">
+                        <label class="setup-label">Your Side</label>
+                        <div class="side-buttons">
+                            <button class="side-btn active" id="petitionerBtn" onclick="selectSide('petitioner')">⚖️
+                                Petitioner</button>
+                            <button class="side-btn" id="respondentBtn" onclick="selectSide('respondent')">🛡️
+                                Respondent</button>
+                        </div>
                     </div>
+
+                    <div class="setup-row">
+                        <label class="setup-label">Moot Problem</label>
+                        <div class="problem-options">
+                            <button class="generate-btn" onclick="generateProblem()" id="generateBtn">🎲 Generate a
+                                Problem</button>
+                            <div class="divider-row">
+                                <div class="divider-line"></div>
+                                <span class="divider-text">or</span>
+                                <div class="divider-line"></div>
+                            </div>
+                            <div class="upload-zone" id="upload-zone"
+                                onclick="document.getElementById('file-input').click()"
+                                ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+                                <div class="upload-icon">📁</div>
+                                <p class="upload-title">Upload case file</p>
+                                <p class="upload-sub">Drag & drop or click — any file type</p>
+                                <input type="file" id="file-input" style="display:none"
+                                    onchange="handleFileUpload(event)">
+                            </div>
+                            <div class="divider-row">
+                                <div class="divider-line"></div>
+                                <span class="divider-text">or</span>
+                                <div class="divider-line"></div>
+                            </div>
+                            <textarea id="custom-problem" class="problem-textarea"
+                                placeholder="Paste your own moot problem here..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="problem-display" id="problem-display"></div>
+                    <button class="start-btn" onclick="startSession()">Start Session →</button>
                 </div>
-
-                <div class="problem-display" id="problem-display"></div>
-
-                <button class="start-btn" onclick="startSession()">Start Session →</button>
             </div>
 
             <div class="chat-window" id="chat-window" style="display:none"></div>
 
             <div class="input-area" id="input-area" style="display:none">
                 <input type="text" id="user-input" placeholder="Type your argument..." />
-                <button onclick="sendMessage()">Send</button>
+                <button class="send-btn" onclick="sendMessage()">Send →</button>
             </div>
         </div>
-
     </div>
+
     <div class="popup-overlay" id="popup-overlay" onclick="closePopup()">
         <div class="popup" onclick="event.stopPropagation()">
             <div class="popup-header">
                 <div>
-                    <p class="popup-title">Evaluation report</p>
+                    <p class="popup-title">Evaluation Report</p>
                     <p class="popup-subtitle" id="popup-chat-name"></p>
                 </div>
                 <button class="popup-close" onclick="closePopup()">✕</button>
@@ -95,6 +166,7 @@
             </div>
         </div>
     </div>
+
     <script src="app.js"></script>
 </body>
 

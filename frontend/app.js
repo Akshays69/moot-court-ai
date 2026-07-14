@@ -1,3 +1,9 @@
+// Check login
+const mootUser = JSON.parse(localStorage.getItem('mootUser'));
+if (!mootUser) {
+    window.location.href = 'login.html';
+}
+
 let currentMode = 'judge';
 let currentChatId = null;
 let currentDomain = 'Constitutional Law';
@@ -25,8 +31,23 @@ function getNextNumber(mode, domain) {
 }
 
 window.onload = function () {
+    const user = JSON.parse(localStorage.getItem('mootUser'));
+    if (user) {
+        document.getElementById('user-pill').innerText = '👤 ' + user.name;
+    }
     switchMode('judge');
 };
+
+function logout() {
+    localStorage.removeItem('mootUser');
+    window.location.href = 'login.html';
+}
+function selectDomain(btn) {
+    document.querySelectorAll('.domain-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDomain = btn.dataset.domain;
+    document.getElementById('header-domain').innerText = btn.dataset.domain + ' · ' + btn.dataset.code;
+}
 
 function switchMode(mode) {
     currentMode = mode;
@@ -62,15 +83,14 @@ function selectSide(side) {
 }
 
 async function generateProblem() {
-    const domain = document.getElementById('domainSelect').value;
-    const btn = document.querySelector('.problem-btn');
+    const btn = document.getElementById('generateBtn');
     btn.innerText = '⏳ Generating...';
     btn.disabled = true;
 
     const response = await fetch('http://127.0.0.1:8000/generate-problem', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ domain: domain, side: currentSide })
+        body: JSON.stringify({ domain: currentDomain, side: currentSide })
     });
 
     const data = await response.json();
@@ -83,13 +103,65 @@ async function generateProblem() {
     btn.disabled = false;
 }
 
+function handleDragOver(event) {
+    event.preventDefault();
+    document.getElementById('upload-zone').classList.add('dragover');
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    document.getElementById('upload-zone').classList.remove('dragover');
+    const file = event.dataTransfer.files[0];
+    if (file) processFile(file);
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) processFile(file);
+}
+
+function processFile(file) {
+    const zone = document.getElementById('upload-zone');
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        const content = e.target.result;
+        document.getElementById('custom-problem').value = content;
+        document.getElementById('problem-display').style.display = 'none';
+
+        const existing = zone.querySelector('.upload-success');
+        if (existing) existing.remove();
+
+        const success = document.createElement('p');
+        success.className = 'upload-success';
+        success.innerText = '✓ ' + file.name + ' uploaded';
+        zone.appendChild(success);
+
+        zone.querySelector('.upload-title').innerText = 'File loaded';
+    };
+
+    if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        reader.readAsText(file);
+    } else {
+        const existing = zone.querySelector('.upload-success');
+        if (existing) existing.remove();
+
+        const success = document.createElement('p');
+        success.className = 'upload-success';
+        success.innerText = '✓ ' + file.name + ' uploaded — paste the case text below';
+        zone.appendChild(success);
+
+        zone.querySelector('.upload-title').innerText = 'File received';
+        document.getElementById('custom-problem').placeholder = 'Paste the case text from your uploaded file here...';
+    }
+}
+
 function extractTopicName(problem) {
     const words = problem.split(' ').slice(0, 5).join(' ');
-    return words.length > 30 ? words.substring(0, 30) + '...' : words;
+    return words.length > 35 ? words.substring(0, 35) + '...' : words;
 }
 
 function startSession() {
-    currentDomain = document.getElementById('domainSelect').value;
     const customProblem = document.getElementById('custom-problem').value.trim();
     const generatedProblem = document.getElementById('problem-display').innerText.trim();
     const problem = customProblem || generatedProblem;
@@ -98,6 +170,7 @@ function startSession() {
         createNewChat(currentDomain, problem);
     }
 
+    document.getElementById('header-domain').innerText = currentDomain + ' · ' + getDomainCode(currentDomain);
     showChatPanel();
 
     if (problem) {
@@ -116,6 +189,10 @@ function startNewChat() {
     document.getElementById('problem-display').style.display = 'none';
     document.getElementById('problem-display').innerText = '';
     document.getElementById('custom-problem').value = '';
+    const zone = document.getElementById('upload-zone');
+    const success = zone.querySelector('.upload-success');
+    if (success) success.remove();
+    zone.querySelector('.upload-title').innerText = 'Upload case file';
     showSetupPanel();
     renderSidebar();
 
@@ -131,7 +208,7 @@ function renderSidebar() {
     const modeChats = chats[currentMode];
 
     if (modeChats.length === 0) {
-        list.innerHTML = '<div style="color:#333;font-size:12px;padding:10px;">No chats yet</div>';
+        list.innerHTML = '<div style="color:#222244;font-size:12px;padding:10px;">No sessions yet</div>';
         return;
     }
 
@@ -140,16 +217,16 @@ function renderSidebar() {
         item.classList.add('chat-item');
         if (chat.id === currentChatId) item.classList.add('active');
 
-        const codeSpan = document.createElement('span');
-        codeSpan.style.cssText = 'color:#555;font-size:11px;display:block;margin-bottom:2px;';
-        codeSpan.innerText = chat.caseId;
+        const idEl = document.createElement('div');
+        idEl.classList.add('chat-item-id');
+        idEl.innerText = chat.caseId;
 
-        const titleSpan = document.createElement('span');
-        titleSpan.style.cssText = 'color:#aaa;font-size:12px;';
-        titleSpan.innerText = chat.topicName;
+        const titleEl = document.createElement('div');
+        titleEl.classList.add('chat-item-title');
+        titleEl.innerText = chat.topicName;
 
-        item.appendChild(codeSpan);
-        item.appendChild(titleSpan);
+        item.appendChild(idEl);
+        item.appendChild(titleEl);
         item.onclick = () => loadChat(chat.id);
         list.appendChild(item);
     });
@@ -159,12 +236,15 @@ function loadChat(id) {
     currentChatId = id;
     const chat = chats[currentMode].find(c => c.id === id);
     if (!chat) return;
+
     const chatWindow = document.getElementById('chat-window');
     chatWindow.innerHTML = '';
     chat.messages.forEach(msg => {
         const cls = msg.sender === 'You' ? 'user-message' : msg.sender === 'Case' ? 'problem-message' : 'ai-message';
         appendMessageToWindow(msg.sender, msg.text, cls);
     });
+
+    document.getElementById('header-domain').innerText = chat.title;
     showChatPanel();
     renderSidebar();
 
@@ -275,19 +355,18 @@ function showPopup(evaluationText, chatName) {
     };
 
     const scores = {
-        'Legal accuracy': get('LEGAL_ACCURACY'),
+        'Legal': get('LEGAL_ACCURACY'),
         'Structure': get('STRUCTURE'),
         'Questions': get('QUESTIONS'),
         'Precedents': get('PRECEDENTS'),
-        'Persuasiveness': get('PERSUASIVENESS')
+        'Persuasion': get('PERSUASIVENESS')
     };
 
     const total = Object.values(scores).reduce((sum, v) => sum + (parseInt(v) || 0), 0);
 
     document.getElementById('popup-chat-name').innerText = chatName;
 
-    const scoresEl = document.getElementById('popup-scores');
-    scoresEl.innerHTML = Object.entries(scores).map(([label, val]) => `
+    document.getElementById('popup-scores').innerHTML = Object.entries(scores).map(([label, val]) => `
         <div class="score-card">
             <p class="score-label">${label}</p>
             <p class="score-value">${val}<span class="score-max">/10</span></p>
