@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moot Court AI — Practice Workspace</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Supabase CDN & Helper -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <script>
+    // Redirect to login if not authenticated
+    (async function() {
+      await new Promise(r => setTimeout(r, 500));
+      
+      const isGuest = localStorage.getItem('mootcourt_is_guest');
+      if (isGuest === 'true') return;
+      
+      try {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        if (!user) {
+          window.location.href = 'login.html';
+        }
+      } catch(e) {}
+    })();
+    </script>
+
+    <!-- Shared Theme Manager -->
+    <script src="theme.js"></script>
+
+    <!-- PDF.js for reading PDF files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Mammoth.js for reading DOCX files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- Marked.js for Markdown Rendering in Chat -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+
+    <script src="sessions.js"></script>
+    <script src="app.js"></script>
+</head>
+
+<body>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+
+    <div class="app">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <button class="sidebar-close-btn" id="sidebar-close-btn" onclick="closeMobileSidebar()" aria-label="Close Sidebar">✕</button>
+
+            <!-- Sidebar Header Row -->
+            <div class="sidebar-header-row">
+                <a href="index.html" class="sidebar-brand" title="Click to view Landing Page">
+                    <div class="brand-icon">⚖️</div>
+                    <div class="brand-text">
+                        <p class="brand-name">Moot Court AI</p>
+                        <p class="brand-sub">← Landing Page</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Mode Tabs (Judge / Lawyer) -->
+            <div class="mode-tabs">
+                <button class="mode-tab active" id="judgeTab" onclick="switchMode('judge')">
+                    <span>⚖️</span> Judge Mode
+                </button>
+                <button class="mode-tab" id="lawyerTab" onclick="switchMode('lawyer')">
+                    <span>⚔️</span> Lawyer Mode
+                </button>
+            </div>
+
+            <!-- Claude-Style Top Menu Items -->
+            <div class="claude-top-menu">
+                <div class="claude-menu-item" onclick="startNewChat()">
+                    <span class="claude-menu-icon">+</span>
+                    <span class="claude-menu-text">New Chat</span>
+                </div>
+                <div class="claude-menu-item" onclick="toggleSearchInput()">
+                    <span class="claude-menu-icon">🔍</span>
+                    <span class="claude-menu-text">Search Chats</span>
+                </div>
+                <div class="claude-menu-item" id="archived-toggle-btn" onclick="toggleArchivedView()">
+                    <span class="claude-menu-icon">🗄️</span>
+                    <span class="claude-menu-text" id="archived-btn-label">Archived</span>
+                </div>
+                <div class="claude-menu-item" onclick="openUserSettingsModal()">
+                    <span class="claude-menu-icon">⚙️</span>
+                    <span class="claude-menu-text">Settings</span>
+                </div>
+            </div>
+
+            <!-- Search Input Box -->
+            <div class="search-box-wrapper" id="search-box-wrapper" style="display: none;">
+                <input type="text" id="sidebar-search-input" placeholder="Search sessions..." oninput="handleSidebarSearch(this.value)" />
+                <button class="search-clear-btn" onclick="clearSidebarSearch()">✕</button>
+            </div>
+
+            <!-- Archived Back Bar -->
+            <div class="archived-back-bar" id="archived-back-bar" style="display: none;" onclick="toggleArchivedView()">
+                <span>← Back to Active Sessions</span>
+            </div>
+
+            <!-- Sessions List Container -->
+            <div class="chat-list" id="sessions-list"></div>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user-block" id="sidebar-user-block" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="overflow: hidden; flex: 1;">
+                        <p id="sidebar-user-name" style="font-size: 13px; font-weight: 600; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
+                        <p id="sidebar-user-email" style="font-size: 11px; color: var(--subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span id="guest-badge" style="display: none; background: rgba(16,185,129,0.2); color: #10b981; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px;">GUEST</span>
+                        <button class="sidebar-settings-gear-btn" onclick="openUserSettingsModal()" title="Settings">⚙️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Options Dropdown Menu -->
+        <div class="session-dropdown-menu" id="session-dropdown-menu" style="display: none;">
+            <div class="dropdown-item" id="dropdown-pin-btn" onclick="handleDropdownPin()">
+                <span class="dropdown-icon">📌</span> <span id="dropdown-pin-label">Pin</span>
+            </div>
+            <div class="dropdown-item" id="dropdown-archive-btn" onclick="handleDropdownArchive()">
+                <span class="dropdown-icon">🗄️</span> <span id="dropdown-archive-label">Archive</span>
+            </div>
+            <div class="dropdown-item danger" onclick="handleDropdownDelete()">
+                <span class="dropdown-icon">🗑️</span> <span>Delete</span>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="main">
+            <div class="main-header">
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Toggle Practice Sessions Sidebar">☰</button>
+                <div class="header-left">
+                    <p class="header-mode" id="mode-label">Judge Mode</p>
+                    <p class="header-domain" id="header-domain">Select a legal domain to begin</p>
+                </div>
+                <div class="header-right">
+                    <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">☀️</button>
+                    <button class="evaluate-btn" onclick="evaluateSession()">📊 Evaluate Session</button>
+                    <div class="user-pill" id="user-pill"></div>
+                    <button class="logout-btn" onclick="logout()">↩ Logout</button>
+                </div>
+            </div>
+
+            <!-- SETUP CONFIGURATION PANEL -->
+            <div class="setup-panel" id="setup-panel">
+                <div class="setup-card">
+                    <div class="setup-card-header">
+                        <h2 class="setup-card-title">Configure Practice Session</h2>
+                        <p class="setup-card-subtitle">Choose your domain, side, and case problem to initiate moot court simulation</p>
+                    </div>
+
+                    <!-- Domain Selection -->
+                    <div class="setup-row">
+                        <div class="setup-header-badge">
+                            <span class="badge-num">1</span>
+                            <span class="badge-label">SELECT LEGAL DOMAIN</span>
+                        </div>
+                        <div class="domain-grid">
+                            <button class="domain-btn domain-con active" data-domain="Constitutional Law" data-code="CON" onclick="selectDomain(this)">
+                                <div class="domain-icon-wrapper">🏛️</div>
+                                <span class="domain-name">Constitutional Law</span>
+                                <span class="domain-code-pill">CON</span>
+                            </button>
+                            <button class="domain-btn domain-crl" data-domain="Criminal Law" data-code="CRL" onclick="selectDomain(this)">
+                                <div class="domain-icon-wrapper">🔒</div>
+                                <span class="domain-name">Criminal Law</span>
+                                <span class="domain-code-pill">CRL</span>
+                            </button>
+                            <button class="domain-btn domain-com" data-domain="Commercial Law" data-code="COM" onclick="selectDomain(this)">
+                                <div class="domain-icon-wrapper">💼</div>
+                                <span class="domain-name">Commercial Law</span>
+                                <span class="domain-code-pill">COM</span>
+                            </button>
+                            <button class="domain-btn domain-ipr" data-domain="Intellectual Property" data-code="IPR" onclick="selectDomain(this)">
+                                <div class="domain-icon-wrapper">💡</div>
+                                <span class="domain-name">Intellectual Property</span>
+                                <span class="domain-code-pill">IPR</span>
+                            </button>
+                            <button class="domain-btn domain-fam" data-domain="Family Law" data-code="FAM" onclick="selectDomain(this)">
+                                <div class="domain-icon-wrapper">⚖️</div>
+                                <span class="domain-name">Family Law</span>
+                                <span class="domain-code-pill">FAM</span>
+                            </button>
+                            <button class="domain-btn domain-env" data-domain="Environmental Law" data-code="ENV" onclick="selectDomain(this)">
+                                <div class="domain-icon-wrapper">🌿</div>
+                                <span class="domain-name">Environmental Law</span>
+                                <span class="domain-code-pill">ENV</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Side Selection -->
+                    <div class="setup-row">
+                        <div class="setup-header-badge">
+                            <span class="badge-num">2</span>
+                            <span class="badge-label">SELECT YOUR SIDE</span>
+                        </div>
+                        <div class="side-cards-grid">
+                            <div class="side-card active" id="petitionerBtn" onclick="selectSide('petitioner')">
+                                <div class="side-icon-wrapper">📜</div>
+                                <div>
+                                    <h4 class="side-title">Petitioner / Appellant</h4>
+                                    <p class="side-desc">Argue to overturn lower ruling</p>
+                                </div>
+                            </div>
+                            <div class="side-card" id="respondentBtn" onclick="selectSide('respondent')">
+                                <div class="side-icon-wrapper">🛡️</div>
+                                <div>
+                                    <h4 class="side-title">Respondent / Appellee</h4>
+                                    <p class="side-desc">Defend lower court decision</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Case Problem Section -->
+                    <div class="setup-row">
+                        <div class="setup-header-badge">
+                            <span class="badge-num">3</span>
+                            <span class="badge-label">PROVIDE CASE PROBLEM</span>
+                        </div>
+                        <div class="problem-source-card">
+                            <button class="generate-btn" id="generate-problem-btn" onclick="generateRandomProblem()">
+                                ✨ Generate AI Moot Proposition
+                            </button>
+                            <div class="divider-row">
+                                <div class="divider-line"></div>
+                                <span class="divider-text">OR UPLOAD FILE</span>
+                                <div class="divider-line"></div>
+                            </div>
+                            <div class="upload-zone upload-area" id="upload-zone">
+                                <div class="upload-icon">📁</div>
+                                <p class="upload-title">Upload Case File (PDF, DOCX, TXT)</p>
+                                <p class="upload-sub">Drag & drop or click to upload</p>
+                            </div>
+                            <input type="file" id="file-input" accept=".pdf,.docx,.txt" style="display:none">
+                            <div class="divider-row">
+                                <div class="divider-line"></div>
+                                <span class="divider-text">OR PASTE CUSTOM TEXT</span>
+                                <div class="divider-line"></div>
+                            </div>
+                            <textarea id="custom-problem" class="problem-textarea" placeholder="Paste custom moot proposition text here..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="problem-display" id="problem-display"></div>
+                    
+                    <button class="start-btn" id="start-session-btn" onclick="startSession()">
+                        🚀 Start Practice Session →
+                    </button>
+                </div>
+            </div>
+
+            <!-- CHAT INTERFACE -->
+            <div class="chat-window" id="chat-window" style="display:none"></div>
+
+            <!-- INPUT AREA -->
+            <div class="input-area" id="input-area" style="display:none">
+                <input type="text" id="user-input" placeholder="Type your legal argument, cite precedents, or respond to bench query..." />
+                <button class="send-btn" id="send-btn" onclick="sendMessage()">Send Argument →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EVALUATION MODAL -->
+    <div id="evaluation-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('evaluation-modal').style.display='none'">✕</button>
+            <div id="evaluation-body"></div>
+        </div>
+    </div>
+
+    <!-- USER SETTINGS MODAL -->
+    <div class="modal-overlay" id="user-settings-modal">
+        <div class="user-settings-card">
+            <div class="user-settings-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 24px;">⚙️</span>
+                    <div>
+                        <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold);">Settings</h2>
+                        <p style="font-size: 12px; color: var(--subtext); margin: 0;">Manage your account, preferences, and data</p>
+                    </div>
+                </div>
+                <button class="modal-close-x" onclick="closeUserSettingsModal()">✕</button>
+            </div>
+
+            <div class="user-settings-body">
+                <!-- SECTION 1: ACCOUNT -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Account Profile</h3>
+                    <div class="user-profile-header-card">
+                        <div class="avatar-circle-lg" id="settings-user-avatar">U</div>
+                        <div class="user-profile-details">
+                            <p class="user-profile-name" id="settings-user-name">User Name</p>
+                            <p class="user-profile-email" id="settings-user-email">user@example.com</p>
+                            <div class="user-profile-badges">
+                                <span class="badge-account-type" id="settings-account-type">Email Account</span>
+                                <span class="user-joined-date" id="settings-user-joined">Member</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="settings-change-password-box" style="margin-top: 12px;">
+                        <button class="btn-settings-action" onclick="handlePasswordReset()">🔒 Send Password Reset Email</button>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: PREFERENCES -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Preferences</h3>
+                    <div class="settings-row-item">
+                        <div>
+                            <div class="settings-row-label">Appearance Theme</div>
+                            <div class="settings-row-sub">Switch between Dark and Light color themes</div>
+                        </div>
+                        <button class="btn-settings-action" onclick="toggleTheme()">☀️ / 🌙 Toggle Theme</button>
+                    </div>
+                    <div class="settings-row-item">
+                        <div>
+                            <div class="settings-row-label">Local Practice Storage</div>
+                            <div class="settings-row-sub">Clear offline guest sessions saved on this device</div>
+                        </div>
+                        <button class="btn-settings-action danger" onclick="handleClearLocalSessions()">🗑️ Clear Local Sessions</button>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: DATA & PRIVACY -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">Data & Privacy</h3>
+                    <div class="settings-row-item">
+                        <div>
+                            <div class="settings-row-label">Export My Practice Data</div>
+                            <div class="settings-row-sub">Download all your chat history and moot court sessions as JSON</div>
+                        </div>
+                        <button class="btn-settings-action" onclick="handleDownloadUserData()">📥 Download My Data</button>
+                    </div>
+                    <p class="privacy-note-text">
+                        🔒 We store your practice sessions, messages, and evaluation results to help you track your progress.
+                    </p>
+                </div>
+
+                <!-- SECTION 4: ACCOUNT ACTIONS -->
+                <div class="settings-group danger-group">
+                    <h3 class="settings-group-title danger">Account Actions</h3>
+                    <div class="settings-actions-flex">
+                        <button class="btn-settings-action danger-outline" onclick="logout()">↩ Logout</button>
+                        <button class="btn-settings-action danger" id="delete-account-btn" onclick="handleRequestAccountDeletion()">⚠️ Delete My Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -4,367 +4,1952 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moot Court AI — Practice Workspace</title>
-    
+    <title>Moot Court AI — Master Legal Advocacy</title>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="style.css">
-    
+    <style>
+        /* CSS VARIABLES & THEMING */
+        :root {
+            --bg-dark: #0a0f1e;
+            --bg-light: #f8fafc;
+            
+            --card-dark: #1e2235;
+            --card-light: #ffffff;
+
+            --border-dark: #2d3148;
+            --border-light: #e2e8f0;
+
+            --text-dark: #f8fafc;
+            --text-light: #0f172a;
+
+            --subtext-dark: #94a3b8;
+            --subtext-light: #475569;
+
+            --gold: #f59e0b;
+            --gold-light: #fbbf24;
+            --purple-rich: #1e1b4b;
+
+            --nav-dark: rgba(10, 15, 30, 0.75);
+            --nav-light: rgba(248, 250, 252, 0.85);
+
+            --gradient-gold: linear-gradient(135deg, #f59e0b, #fbbf24);
+            --gradient-hero-dark: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #0a0f1e 70%);
+        }
+
+        [data-theme="dark"] {
+            --bg: var(--bg-dark);
+            --card-bg: var(--card-dark);
+            --border: var(--border-dark);
+            --text: var(--text-dark);
+            --subtext: var(--subtext-dark);
+            --nav-bg: var(--nav-dark);
+            --stats-border: rgba(245, 158, 11, 0.2);
+            --dot-color: rgba(255, 255, 255, 0.05);
+        }
+
+        [data-theme="light"] {
+            --bg: var(--bg-light);
+            --card-bg: var(--card-light);
+            --border: var(--border-light);
+            --text: var(--text-light);
+            --subtext: var(--subtext-light);
+            --nav-bg: var(--nav-light);
+            --stats-border: rgba(15, 23, 42, 0.1);
+            --dot-color: rgba(15, 23, 42, 0.05);
+        }
+
+        /* GLOBAL RESET & BASE STYLES */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
+        .legal-quote {
+            font-family: 'EB Garamond', serif;
+            font-style: italic;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* SECTION HEADINGS */
+        .section-label {
+            color: var(--gold);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-subtext {
+            font-size: 1.1rem;
+            color: var(--subtext);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* BUTTONS */
+        .btn-gold {
+            background: var(--gold);
+            color: #0a0f1e;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 10px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .btn-gold:hover {
+            background: var(--gold-light);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-outline-white {
+            background: transparent;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 14px;
+            padding: 10px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        .btn-outline-white:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            transform: translateY(-1px);
+        }
+
+        /* -------------------------------------------------------------
+           NAVBAR — CLEAN PROFESSIONAL STYLE
+        ------------------------------------------------------------- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 18px 0;
+            background: transparent;
+            transition: padding 0.3s ease, background-color 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            padding: 14px 0;
+            background: var(--nav-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Left Side Logo */
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-logo-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--gold);
+        }
+
+        .nav-logo-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+
+        /* Center Nav Links */
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 36px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--subtext);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            position: relative;
+            padding: 4px 0;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--gold);
+            transition: width 0.25s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Right Side Actions */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle-btn {
+            background: none;
+            border: none;
+            color: var(--subtext);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px;
+            transition: color 0.2s ease, opacity 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--gold);
+            opacity: 1;
+        }
+
+        .nav-login-link {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .nav-login-link:hover {
+            color: var(--gold);
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Mobile Menu Drawer Overlay */
+        .mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 32px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .mobile-menu-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .mobile-close-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .mobile-nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .mobile-nav-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* -------------------------------------------------------------
+           HERO SECTION
+        ------------------------------------------------------------- */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            padding-top: 130px;
+            padding-bottom: 80px;
+            display: flex;
+            align-items: center;
+            background: var(--gradient-hero-dark);
+            overflow: hidden;
+        }
+
+        /* Subtle Background Dot Mesh */
+        .hero-dots-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 48px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.06);
+            color: var(--gold);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-size: 3.8rem;
+            line-height: 1.12;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 22px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-title-gold {
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+        }
+
+        .hero-sub {
+            font-size: 1.125rem;
+            color: var(--subtext);
+            line-height: 1.65;
+            margin-bottom: 36px;
+            max-width: 540px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .hero-trust-line {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 13px;
+            color: var(--subtext);
+            flex-wrap: wrap;
+        }
+
+        .hero-trust-line span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .check-gold {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* HERO UI MOCKUP CARD */
+        .app-mockup-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+            animation: heroCardFloat 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes heroCardFloat {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-12px); }
+        }
+
+        .mockup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .mockup-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .mockup-session-info {
+            font-size: 12px;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        .mockup-bubble {
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .mockup-bubble-judge {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: var(--text);
+        }
+
+        .mockup-bubble-user {
+            background: var(--purple-rich);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .bubble-author {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mockup-input-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .mockup-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: var(--subtext);
+        }
+
+        .mockup-send-btn {
+            background: var(--gold);
+            color: #0a0f1e;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        /* -------------------------------------------------------------
+           STATS BAR
+        ------------------------------------------------------------- */
+        .stats-bar {
+            border-top: 1px solid var(--stats-border);
+            border-bottom: 1px solid var(--stats-border);
+            padding: 36px 0;
+            background: rgba(10, 15, 30, 0.4);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            text-align: center;
+        }
+
+        .stat-item {
+            position: relative;
+            padding: 0 16px;
+        }
+
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 15%;
+            height: 70%;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--subtext);
+            font-weight: 500;
+        }
+
+        /* -------------------------------------------------------------
+           FEATURES SECTION
+        ------------------------------------------------------------- */
+        .features-section {
+            padding: 110px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.12);
+        }
+
+        .feature-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(30, 27, 75, 0.6));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            color: var(--subtext);
+            line-height: 1.6;
+        }
+
+        /* -------------------------------------------------------------
+           ABOUT SECTION
+        ------------------------------------------------------------- */
+        .about-section {
+            padding: 110px 0;
+            background: rgba(30, 27, 75, 0.08);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+        }
+
+        .about-text p {
+            font-size: 1.05rem;
+            color: var(--subtext);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .about-stats-boxes {
+            display: flex;
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .about-stat-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 28px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .about-stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--gold);
+        }
+
+        .about-stat-lbl {
+            font-size: 13px;
+            color: var(--subtext);
+            margin-top: 4px;
+        }
+
+        /* SVG SCALES ILLUSTRATION */
+        .scales-illustration-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .svg-scales-art {
+            width: 100%;
+            max-width: 380px;
+            height: auto;
+            filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.25));
+        }
+
+        /* -------------------------------------------------------------
+           HOW IT WORKS SECTION
+        ------------------------------------------------------------- */
+        .how-section {
+            padding: 110px 0;
+        }
+
+        .how-timeline {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            position: relative;
+        }
+
+        .how-timeline::before {
+            content: '';
+            position: absolute;
+            top: 70px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            border-top: 2px dashed var(--gold);
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        .how-step-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 36px 28px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .step-icon {
+            font-size: 32px;
+        }
+
+        .step-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .step-text {
+            font-size: 0.95rem;
+            color: var(--subtext);
+            line-height: 1.6;
+        }
+
+        /* -------------------------------------------------------------
+           LEGAL DOMAINS SECTION
+        ------------------------------------------------------------- */
+        .domains-section {
+            padding: 110px 0;
+            background: rgba(30, 27, 75, 0.08);
+        }
+
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .domain-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+
+        .domain-card:hover {
+            transform: translateY(-2px);
+            border-left: 4px solid var(--gold);
+            border-color: var(--gold);
+        }
+
+        .domain-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .domain-name-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .domain-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .domain-badge {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gold);
+            background: rgba(245, 158, 11, 0.15);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .domain-desc {
+            font-size: 0.88rem;
+            color: var(--subtext);
+            line-height: 1.5;
+        }
+
+        /* -------------------------------------------------------------
+           FAQ SECTION
+        ------------------------------------------------------------- */
+        .faq-section {
+            padding: 110px 0;
+        }
+
+        .faq-accordion {
+            max-width: 820px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.25s ease;
+        }
+
+        .faq-item.active {
+            border-left: 4px solid var(--gold);
+            border-color: var(--gold);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 22px 28px;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.05rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .faq-toggle-icon {
+            font-size: 20px;
+            color: var(--gold);
+            font-weight: 400;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), padding 0.3s ease;
+            padding: 0 28px;
+            color: var(--subtext);
+            font-size: 0.98rem;
+            line-height: 1.65;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 250px;
+            padding: 0 28px 24px 28px;
+            transition: max-height 0.3s ease-in-out, padding 0.3s ease;
+        }
+
+        /* -------------------------------------------------------------
+           TESTIMONIALS SECTION
+        ------------------------------------------------------------- */
+        .testimonials-section {
+            padding: 110px 0;
+            background: rgba(30, 27, 75, 0.08);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stars-gold {
+            color: var(--gold);
+            font-size: 16px;
+            letter-spacing: 3px;
+            margin-bottom: 16px;
+        }
+
+        .testimonial-quote {
+            font-family: 'EB Garamond', serif;
+            font-style: italic;
+            font-size: 1.15rem;
+            color: var(--text);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .testimonial-author-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .author-avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .author-info-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        .author-info-college {
+            font-size: 0.85rem;
+            color: var(--subtext);
+        }
+
+        /* -------------------------------------------------------------
+           CTA SECTION
+        ------------------------------------------------------------- */
+        .cta-section {
+            padding: 100px 0;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #1e1b4b 0%, #0a0f1e 100%);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 20px;
+            padding: 70px 40px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        .cta-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .cta-sub {
+            font-size: 1.1rem;
+            color: var(--subtext);
+            margin-bottom: 32px;
+        }
+
+        /* -------------------------------------------------------------
+           FOOTER
+        ------------------------------------------------------------- */
+        .footer {
+            background: #080d1a;
+            color: #94a3b8;
+            padding: 80px 0 32px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1.2fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 14px;
+        }
+
+        .footer-desc {
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: #94a3b8;
+            max-width: 320px;
+        }
+
+        .footer-col-title {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .footer-links-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links-list a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.92rem;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links-list a:hover {
+            color: var(--gold);
+        }
+
+        .footer-contact-info {
+            font-size: 0.92rem;
+            line-height: 1.75;
+            color: #94a3b8;
+        }
+
+        .footer-contact-info strong {
+            color: #ffffff;
+        }
+
+        /* CONTACT COLUMN LINKS */
+        .footer-contact-block {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .footer-made-by {
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: #94a3b8;
+        }
+
+        .footer-made-by strong {
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .footer-inst-name {
+            font-size: 0.88rem;
+            color: #94a3b8;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .footer-contact-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s ease, transform 0.15s ease;
+        }
+
+        .footer-contact-link:hover {
+            color: var(--gold, #f59e0b);
+            transform: translateX(2px);
+        }
+
+        .contact-icon {
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.2s ease;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-contact-link:hover .contact-icon {
+            color: var(--gold, #f59e0b);
+        }
+
+        .contact-link-text {
+            word-break: break-all;
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: rgba(245, 158, 11, 0.2);
+            margin-bottom: 28px;
+        }
+
+        .footer-bottom-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            color: #64748b;
+        }
+
+        /* BACK TO TOP BUTTON */
+        .back-to-top {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--gold);
+            color: #0a0f1e;
+            border: none;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.2s ease;
+            z-index: 999;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-3px);
+        }
+
+        /* SCROLL REVEAL ANIMATION CLASS */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .reveal-on-scroll.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* -------------------------------------------------------------
+           RESPONSIVE MOBILE BREAKPOINTS
+        ------------------------------------------------------------- */
+        @media (max-width: 992px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 48px;
+                text-align: center;
+            }
+
+            .hero-sub { margin-left: auto; margin-right: auto; }
+            .hero-buttons, .hero-trust-line { justify-content: center; }
+
+            .about-grid, .features-grid, .domains-grid, .testimonials-grid, .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .how-timeline {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+
+            .how-timeline::before { display: none; }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+
+            .stat-item:not(:last-child)::after { display: none; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .nav-actions .nav-login-link, .nav-actions .btn-gold {
+                display: none;
+            }
+
+            .hamburger-btn {
+                display: block;
+            }
+
+            .hero-title { font-size: 2.75rem; }
+            .section-title { font-size: 2rem; }
+            .cta-title { font-size: 2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom-bar {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BACK TO TOP BUTTON -->
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">↑</button>
+
+    <!-- MOBILE OVERLAY MENU -->
+    <div class="mobile-menu-overlay" id="mobileMenu">
+        <button class="mobile-close-btn" onclick="toggleMobileMenu()">✕</button>
+        <ul class="mobile-nav-links">
+            <li><a href="#features" onclick="toggleMobileMenu()">Features</a></li>
+            <li><a href="#about" onclick="toggleMobileMenu()">About</a></li>
+            <li><a href="#how-it-works" onclick="toggleMobileMenu()">How It Works</a></li>
+            <li><a href="#faq" onclick="toggleMobileMenu()">FAQ</a></li>
+            <li><a href="#footer-contact" onclick="toggleMobileMenu()">Contact</a></li>
+            <li><a href="login.html">Login</a></li>
+        </ul>
+        <a href="app.html" class="btn-gold" style="width: 220px;">Get Started Free →</a>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <!-- Left Side Logo -->
+            <a href="index.html" class="nav-logo">
+                <svg class="nav-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                    <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                    <path d="M7 21h10"/>
+                    <path d="M12 3v18"/>
+                    <path d="M3 7h18"/>
+                </svg>
+                <span class="nav-logo-text">Moot Court AI</span>
+            </a>
+
+            <!-- Center Navigation Links -->
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#footer-contact">Contact</a></li>
+            </ul>
+
+            <!-- Right Side Actions -->
+            <div class="nav-actions">
+                <button class="theme-toggle-btn" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                </button>
+                <a href="login.html" class="nav-login-link">Login</a>
+                <a href="app.html" class="btn-gold">Get Started</a>
+                <button class="hamburger-btn" onclick="toggleMobileMenu()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-dots-pattern"></div>
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <span class="hero-badge">
+                        ⚡ AI Powered Legal Practice Platform
+                    </span>
+                    <h1 class="hero-title">
+                        Master the Art of
+                        <span class="hero-title-gold">Moot Court Advocacy</span>
+                    </h1>
+                    <p class="hero-sub">
+                        Practice with an AI Judge, sharpen your legal arguments, and get evaluated like a real courtroom — all from your browser.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="app.html" class="btn-gold" style="padding: 14px 28px; font-size: 15px;">Start Practicing Free →</a>
+                        <a href="#how-it-works" class="btn-outline-white" style="padding: 14px 28px; font-size: 15px;">See How It Works</a>
+                    </div>
+                    <div class="hero-trust-line">
+                        <span><strong class="check-gold">✓</strong> No account needed</span>
+                        <span><strong class="check-gold">✓</strong> Free to use</span>
+                        <span><strong class="check-gold">✓</strong> 6 Legal Domains</span>
+                    </div>
+                </div>
+
+                <!-- Right Side UI Mockup Card -->
+                <div class="hero-mockup">
+                    <div class="app-mockup-card">
+                        <div class="mockup-header">
+                            <div class="mockup-brand">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h18"/></svg>
+                                Moot Court AI
+                            </div>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        </div>
+                        <div class="mockup-session-info">
+                            Constitutional Law · Petitioner
+                        </div>
+                        <div class="mockup-bubble mockup-bubble-judge">
+                            <div class="bubble-author">👨‍⚖️ AI Judge</div>
+                            "Counsel, please elaborate on Article 21 and how it applies to this case..."
+                        </div>
+                        <div class="mockup-bubble mockup-bubble-user">
+                            <div class="bubble-author">👤 You (Petitioner)</div>
+                            "My lord, the right to life under Art. 21 encompasses the right to privacy..."
+                        </div>
+                        <div class="mockup-input-row">
+                            <div class="mockup-input">Type your argument...</div>
+                            <button class="mockup-send-btn">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <section class="stats-bar">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number" data-target="6">0</div>
+                    <div class="stat-label">Legal Domains</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="2">0</div>
+                    <div class="stat-label">Practice Modes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="5">0</div>
+                    <div class="stat-label">Evaluation Metrics</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" data-target="100" data-suffix="%">0</div>
+                    <div class="stat-label">Free to Use</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features-section reveal-on-scroll" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">FEATURES</span>
+                <h2 class="section-title">Everything You Need to Excel in Moot Court</h2>
+                <p class="section-subtext">Comprehensive legal practice tools built specifically for law students and advocates</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-box">🤖</div>
+                    <h3 class="feature-title">AI Judge & Counsel</h3>
+                    <p class="feature-desc">Face an intelligent AI that challenges your arguments with probing questions just like a real judge would.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">📊</div>
+                    <h3 class="feature-title">Detailed Evaluation</h3>
+                    <p class="feature-desc">Get scored on 5 parameters — argument strength, legal accuracy, precedent use, rebuttal quality and domain knowledge.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">📁</div>
+                    <h3 class="feature-title">Upload Case Files</h3>
+                    <p class="feature-desc">Upload PDF, DOCX or TXT case files. The AI reads and uses your case as the basis for the entire session.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">💾</div>
+                    <h3 class="feature-title">Session History</h3>
+                    <p class="feature-desc">Every session is saved automatically. Return anytime and pick up exactly where you left off.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">👤</div>
+                    <h3 class="feature-title">Guest Mode</h3>
+                    <p class="feature-desc">No signup required. Jump straight into a session as a guest and experience the full platform.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box">🏛</div>
+                    <h3 class="feature-title">6 Legal Domains</h3>
+                    <p class="feature-desc">Practice across Constitutional, Criminal, Commercial, IP, Family and Environmental law with domain-specific AI responses.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about-section reveal-on-scroll" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-text">
+                    <span class="section-label">ABOUT</span>
+                    <h2 class="section-title">What is Moot Court AI?</h2>
+                    <p>
+                        Moot Court AI is an intelligent legal practice platform built for law students and advocates who want to sharpen their courtroom skills without waiting for scheduled moot court events.
+                    </p>
+                    <p>
+                        Using advanced AI, the platform simulates real courtroom scenarios. You can argue as a Petitioner or Respondent, face cross-examination from an AI judge, cite legal precedents, and handle objections — all in real time.
+                    </p>
+                    <p>
+                        After each session, receive a detailed performance evaluation with scores, strengths, weaknesses, and actionable tips to improve your advocacy skills.
+                    </p>
+
+                    <div class="about-stats-boxes">
+                        <div class="about-stat-box">
+                            <div class="about-stat-num">6</div>
+                            <div class="about-stat-lbl">Legal Domains</div>
+                        </div>
+                        <div class="about-stat-box">
+                            <div class="about-stat-num">5</div>
+                            <div class="about-stat-lbl">Evaluation Metrics</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="scales-illustration-container">
+                    <!-- Elegant SVG Scales of Justice -->
+                    <svg class="svg-scales-art" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M100 25 V165" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M60 170 H140" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M40 55 H160" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                        <circle cx="100" cy="55" r="7" fill="#f59e0b"/>
+                        <circle cx="100" cy="25" r="5" fill="#f59e0b"/>
+                        <!-- Left Bowl -->
+                        <line x1="40" y1="55" x2="25" y2="105" stroke="#f59e0b" stroke-width="2"/>
+                        <line x1="40" y1="55" x2="55" y2="105" stroke="#f59e0b" stroke-width="2"/>
+                        <path d="M20 105 Q40 125 60 105 Z" fill="url(#goldGradient)"/>
+                        <!-- Right Bowl -->
+                        <line x1="160" y1="55" x2="145" y2="105" stroke="#f59e0b" stroke-width="2"/>
+                        <line x1="160" y1="55" x2="175" y2="105" stroke="#f59e0b" stroke-width="2"/>
+                        <path d="M140 105 Q160 125 180 105 Z" fill="url(#goldGradient)"/>
+                        <defs>
+                            <linearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#f59e0b"/>
+                                <stop offset="100%" stop-color="#fbbf24"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS SECTION -->
+    <section class="how-section reveal-on-scroll" id="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">HOW IT WORKS</span>
+                <h2 class="section-title">From Login to Verdict in Minutes</h2>
+                <p class="section-subtext">Mastering courtroom advocacy in three seamless steps</p>
+            </div>
+
+            <div class="how-timeline">
+                <div class="how-step-card">
+                    <div class="step-number">
+                        01
+                        <span class="step-icon">🏛</span>
+                    </div>
+                    <h3 class="step-title">Choose Your Case</h3>
+                    <p class="step-text">Select a legal domain, pick your side, and either upload a case file or generate one instantly with AI.</p>
+                </div>
+
+                <div class="how-step-card">
+                    <div class="step-number">
+                        02
+                        <span class="step-icon">⚖</span>
+                    </div>
+                    <h3 class="step-title">Argue Your Case</h3>
+                    <p class="step-text">Engage with the AI judge or opposing counsel. Present arguments, respond to questions, and cite precedents.</p>
+                </div>
+
+                <div class="how-step-card">
+                    <div class="step-number">
+                        03
+                        <span class="step-icon">📊</span>
+                    </div>
+                    <h3 class="step-title">Get Your Verdict</h3>
+                    <p class="step-text">Receive a structured evaluation scorecard with scores, feedback, and tips to improve next time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LEGAL DOMAINS SECTION -->
+    <section class="domains-section reveal-on-scroll">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">PRACTICE AREAS</span>
+                <h2 class="section-title">6 Legal Domains to Master</h2>
+                <p class="section-subtext">Tailored AI models benchmarked across core legal practice areas</p>
+            </div>
+
+            <div class="domains-grid">
+                <div class="domain-card">
+                    <div class="domain-icon-box">🏛</div>
+                    <div>
+                        <div class="domain-name-row">
+                            <span class="domain-name">Constitutional Law</span>
+                            <span class="domain-badge">CON</span>
+                        </div>
+                        <p class="domain-desc">Fundamental rights, constitutional validity and writ jurisdiction</p>
+                    </div>
+                </div>
+
+                <div class="domain-card">
+                    <div class="domain-icon-box">🔒</div>
+                    <div>
+                        <div class="domain-name-row">
+                            <span class="domain-name">Criminal Law</span>
+                            <span class="domain-badge">CRL</span>
+                        </div>
+                        <p class="domain-desc">Prosecution, defense strategy and criminal procedure</p>
+                    </div>
+                </div>
+
+                <div class="domain-card">
+                    <div class="domain-icon-box">💼</div>
+                    <div>
+                        <div class="domain-name-row">
+                            <span class="domain-name">Commercial Law</span>
+                            <span class="domain-badge">COM</span>
+                        </div>
+                        <p class="domain-desc">Contracts, corporate disputes and commercial transactions</p>
+                    </div>
+                </div>
+
+                <div class="domain-card">
+                    <div class="domain-icon-box">💡</div>
+                    <div>
+                        <div class="domain-name-row">
+                            <span class="domain-name">Intellectual Property</span>
+                            <span class="domain-badge">IPR</span>
+                        </div>
+                        <p class="domain-desc">Patents, trademarks, copyright and trade secrets</p>
+                    </div>
+                </div>
+
+                <div class="domain-card">
+                    <div class="domain-icon-box">👨‍👩‍👧</div>
+                    <div>
+                        <div class="domain-name-row">
+                            <span class="domain-name">Family Law</span>
+                            <span class="domain-badge">FAM</span>
+                        </div>
+                        <p class="domain-desc">Matrimonial disputes, custody rights and inheritance</p>
+                    </div>
+                </div>
+
+                <div class="domain-card">
+                    <div class="domain-icon-box">🌿</div>
+                    <div>
+                        <div class="domain-name-row">
+                            <span class="domain-name">Environmental Law</span>
+                            <span class="domain-badge">ENV</span>
+                        </div>
+                        <p class="domain-desc">Environmental protection, pollution liability and green rights</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="faq-section reveal-on-scroll" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">FAQ</span>
+                <h2 class="section-title">Frequently Asked Questions</h2>
+                <p class="section-subtext">Everything you need to know about Moot Court AI</p>
+            </div>
+
+            <div class="faq-accordion">
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>Is Moot Court AI completely free?</span>
+                        <span class="faq-toggle-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Yes, completely free. Use Guest Mode without even creating an account. No hidden charges or subscriptions.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>Do I need to create an account?</span>
+                        <span class="faq-toggle-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        No. Guest Mode lets you try the full platform instantly. Create an account only if you want to save your sessions and track your progress over time.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>Which legal domains are available?</span>
+                        <span class="faq-toggle-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Constitutional Law, Criminal Law, Commercial Law, Intellectual Property, Family Law, and Environmental Law — with domain-specific AI responses for each area.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>How does the AI evaluation work?</span>
+                        <span class="faq-toggle-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        After each session the AI judge evaluates you on 5 parameters: Argument Strength, Legal Accuracy, Use of Precedent, Rebuttal Quality, and Domain Knowledge. You receive a full scorecard with feedback.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I upload my own case files?</span>
+                        <span class="faq-toggle-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Yes. Upload PDF, DOCX or TXT files and the AI uses your case as context for the entire session.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFaq(this)">
+                        <span>Is my conversation data secure?</span>
+                        <span class="faq-toggle-icon">+</span>
+                    </button>
+                    <div class="faq-answer">
+                        Your sessions are stored locally in your browser. We do not store or share your conversations with any third parties.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TESTIMONIALS SECTION -->
+    <section class="testimonials-section reveal-on-scroll">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">TESTIMONIALS</span>
+                <h2 class="section-title">Trusted by Law Students</h2>
+                <p class="section-subtext">Hear from advocate trainees and students preparing for national moots</p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div>
+                        <div class="stars-gold">★★★★★</div>
+                        <p class="testimonial-quote">
+                            "This platform completely transformed how I prepare for moot court. The AI judge asks incredibly challenging questions that you never expect."
+                        </p>
+                    </div>
+                    <div class="testimonial-author-row">
+                        <div class="author-avatar-circle">PM</div>
+                        <div>
+                            <div class="author-info-name">P.M.</div>
+                            <div class="author-info-college">NLSIU Bangalore</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div>
+                        <div class="stars-gold">★★★★★</div>
+                        <p class="testimonial-quote">
+                            "The evaluation report is detailed and honest. I could see exactly where I was going wrong and what to work on before the actual competition."
+                        </p>
+                    </div>
+                    <div class="testimonial-author-row">
+                        <div class="author-avatar-circle">AN</div>
+                        <div>
+                            <div class="author-info-name">A.N.</div>
+                            <div class="author-info-college">NLIU Bhopal</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div>
+                        <div class="stars-gold">★★★★★</div>
+                        <p class="testimonial-quote">
+                            "Finally a tool that understands Indian constitutional law deeply. The Article 21 arguments were spot on and very challenging to counter."
+                        </p>
+                    </div>
+                    <div class="testimonial-author-row">
+                        <div class="author-avatar-circle">SK</div>
+                        <div>
+                            <div class="author-info-name">S.K.</div>
+                            <div class="author-info-college">CUSAT Kochi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-box">
+                <h2 class="cta-title">Ready to Master Moot Court?</h2>
+                <p class="cta-sub">Start practicing today — no account required.</p>
+                <a href="app.html" class="btn-gold" style="padding: 14px 32px; font-size: 16px;">Start Practicing Free →</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h18"/></svg>
+                        Moot Court AI
+                    </div>
+                    <p class="footer-desc">
+                        An AI-powered moot court practice platform for law students and advocates.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="footer-col-title">Quick Links</h4>
+                    <ul class="footer-links-list">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#how-it-works">How It Works</a></li>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </div>
+
+                <div id="footer-contact">
+                    <h4 class="footer-col-title">Contact</h4>
+                    <div class="footer-contact-block">
+                        <div class="footer-made-by">
+                            Made with ❤️ by<br>
+                            <strong>AKSHAY S</strong>
+                            <span class="footer-inst-name">Cochin University College of Engineering Kuttanad</span>
+                        </div>
+
+                        <ul class="footer-contact-links">
+                            <li>
+                                <a href="mailto:akshaydevprojects@gmail.com" class="footer-contact-link">
+                                    <svg class="contact-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6z"/>
+                                        <polyline points="22,6 12,13 2,6"/>
+                                    </svg>
+                                    <span class="contact-link-text">akshaydevprojects@gmail.com</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/Akshays69/moot-court-ai" target="_blank" rel="noopener noreferrer" class="footer-contact-link">
+                                    <svg class="contact-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577 0-.286-.011-1.231-.017-2.234-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                                    </svg>
+                                    <span class="contact-link-text">Akshays69/moot-court-ai</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://www.linkedin.com/in/akshays05/" target="_blank" rel="noopener noreferrer" class="footer-contact-link">
+                                    <svg class="contact-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                                    </svg>
+                                    <span class="contact-link-text">Akshay S</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://wa.me/919895735981" target="_blank" rel="noopener noreferrer" class="footer-contact-link">
+                                    <svg class="contact-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413"/>
+                                    </svg>
+                                    <span class="contact-link-text">+91 98957 35981</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-divider"></div>
+
+            <div class="footer-bottom-bar">
+                <div>© 2025 Moot Court AI V1.1 · All rights reserved.</div>
+                <div>Built at CUSAT Kuttanad</div>
+            </div>
+        </div>
+    </footer>
+
     <!-- Supabase CDN & Helper -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase.js"></script>
 
-    <script>
-    // Redirect to login if not authenticated
-    (async function() {
-      await new Promise(r => setTimeout(r, 500));
-      
-      const isGuest = localStorage.getItem('mootcourt_is_guest');
-      if (isGuest === 'true') return;
-      
-      try {
-        const { data: { user } } = await supabaseClient.auth.getUser();
-        if (!user) {
-          window.location.href = 'login.html';
-        }
-      } catch(e) {}
-    })();
-    </script>
-
-    <!-- Shared Theme Manager -->
+    <!-- SHARED THEME SCRIPT -->
     <script src="theme.js"></script>
 
-    <!-- PDF.js for reading PDF files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- Mammoth.js for reading DOCX files -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            const backToTopBtn = document.getElementById('backToTop');
+            
+            if (window.scrollY > 30) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
 
-    <!-- Marked.js for Markdown Rendering in Chat -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+            if (window.scrollY > 400) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
 
-    <script src="sessions.js"></script>
-    <script src="app.js"></script>
-</head>
+        // Mobile Menu Drawer Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('open');
+        }
 
-<body>
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeMobileSidebar()"></div>
+        // Scroll back to top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-    <div class="app">
+        // FAQ Accordion - Only ONE item open at a time
+        function toggleFaq(btn) {
+            const item = btn.parentElement;
+            const isActive = item.classList.contains('active');
+            
+            document.querySelectorAll('.faq-item').forEach(el => {
+                el.classList.remove('active');
+                const icon = el.querySelector('.faq-toggle-icon');
+                if (icon) icon.textContent = '+';
+            });
 
-        <!-- SIDEBAR -->
-        <div class="sidebar">
-            <button class="sidebar-close-btn" id="sidebar-close-btn" onclick="closeMobileSidebar()" aria-label="Close Sidebar">✕</button>
+            if (!isActive) {
+                item.classList.add('active');
+                const icon = item.querySelector('.faq-toggle-icon');
+                if (icon) icon.textContent = '−';
+            }
+        }
 
-            <!-- Sidebar Header Row -->
-            <div class="sidebar-header-row">
-                <a href="landing.html" class="sidebar-brand" title="Click to view Landing Page">
-                    <div class="brand-icon">⚖️</div>
-                    <div class="brand-text">
-                        <p class="brand-name">Moot Court AI</p>
-                        <p class="brand-sub">← Landing Page</p>
-                    </div>
-                </a>
-            </div>
+        // IntersectionObserver for Stats Count-Up & Scroll Reveal
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll Reveal Animation
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
 
-            <!-- Mode Tabs (Judge / Lawyer) -->
-            <div class="mode-tabs">
-                <button class="mode-tab active" id="judgeTab" onclick="switchMode('judge')">
-                    <span>⚖️</span> Judge Mode
-                </button>
-                <button class="mode-tab" id="lawyerTab" onclick="switchMode('lawyer')">
-                    <span>⚔️</span> Lawyer Mode
-                </button>
-            </div>
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => revealObserver.observe(el));
 
-            <!-- Claude-Style Top Menu Items -->
-            <div class="claude-top-menu">
-                <div class="claude-menu-item" onclick="startNewChat()">
-                    <span class="claude-menu-icon">+</span>
-                    <span class="claude-menu-text">New Chat</span>
-                </div>
-                <div class="claude-menu-item" onclick="toggleSearchInput()">
-                    <span class="claude-menu-icon">🔍</span>
-                    <span class="claude-menu-text">Search Chats</span>
-                </div>
-                <div class="claude-menu-item" id="archived-toggle-btn" onclick="toggleArchivedView()">
-                    <span class="claude-menu-icon">🗄️</span>
-                    <span class="claude-menu-text" id="archived-btn-label">Archived</span>
-                </div>
-                <div class="claude-menu-item" onclick="openUserSettingsModal()">
-                    <span class="claude-menu-icon">⚙️</span>
-                    <span class="claude-menu-text">Settings</span>
-                </div>
-            </div>
+            // Stats Count-Up Animation
+            let statsAnimated = false;
+            const statsBar = document.querySelector('.stats-bar');
+            const statsObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !statsAnimated) {
+                    statsAnimated = true;
+                    document.querySelectorAll('.stat-number').forEach(stat => {
+                        const target = parseInt(stat.getAttribute('data-target'));
+                        const suffix = stat.getAttribute('data-suffix') || '';
+                        let count = 0;
+                        const duration = 1500;
+                        const increment = target / (duration / 30);
+                        const timer = setInterval(() => {
+                            count += increment;
+                            if (count >= target) {
+                                count = target;
+                                clearInterval(timer);
+                            }
+                            stat.textContent = Math.floor(count) + suffix;
+                        }, 30);
+                    });
+                }
+            }, { threshold: 0.3 });
 
-            <!-- Search Input Box -->
-            <div class="search-box-wrapper" id="search-box-wrapper" style="display: none;">
-                <input type="text" id="sidebar-search-input" placeholder="Search sessions..." oninput="handleSidebarSearch(this.value)" />
-                <button class="search-clear-btn" onclick="clearSidebarSearch()">✕</button>
-            </div>
-
-            <!-- Archived Back Bar -->
-            <div class="archived-back-bar" id="archived-back-bar" style="display: none;" onclick="toggleArchivedView()">
-                <span>← Back to Active Sessions</span>
-            </div>
-
-            <!-- Sessions List Container -->
-            <div class="chat-list" id="sessions-list"></div>
-
-            <div class="sidebar-footer">
-                <div class="sidebar-user-block" id="sidebar-user-block" style="display: flex; align-items: center; justify-content: space-between;">
-                    <div style="overflow: hidden; flex: 1;">
-                        <p id="sidebar-user-name" style="font-size: 13px; font-weight: 600; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
-                        <p id="sidebar-user-email" style="font-size: 11px; color: var(--subtext); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></p>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                        <span id="guest-badge" style="display: none; background: rgba(16,185,129,0.2); color: #10b981; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 6px;">GUEST</span>
-                        <button class="sidebar-settings-gear-btn" onclick="openUserSettingsModal()" title="Settings">⚙️</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Session Options Dropdown Menu -->
-        <div class="session-dropdown-menu" id="session-dropdown-menu" style="display: none;">
-            <div class="dropdown-item" id="dropdown-pin-btn" onclick="handleDropdownPin()">
-                <span class="dropdown-icon">📌</span> <span id="dropdown-pin-label">Pin</span>
-            </div>
-            <div class="dropdown-item" id="dropdown-archive-btn" onclick="handleDropdownArchive()">
-                <span class="dropdown-icon">🗄️</span> <span id="dropdown-archive-label">Archive</span>
-            </div>
-            <div class="dropdown-item danger" onclick="handleDropdownDelete()">
-                <span class="dropdown-icon">🗑️</span> <span>Delete</span>
-            </div>
-        </div>
-
-        <!-- MAIN CONTENT AREA -->
-        <div class="main">
-            <div class="main-header">
-                <button class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="Toggle Practice Sessions Sidebar">☰</button>
-                <div class="header-left">
-                    <p class="header-mode" id="mode-label">Judge Mode</p>
-                    <p class="header-domain" id="header-domain">Select a legal domain to begin</p>
-                </div>
-                <div class="header-right">
-                    <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">☀️</button>
-                    <button class="evaluate-btn" onclick="evaluateSession()">📊 Evaluate Session</button>
-                    <div class="user-pill" id="user-pill"></div>
-                    <button class="logout-btn" onclick="logout()">↩ Logout</button>
-                </div>
-            </div>
-
-            <!-- SETUP CONFIGURATION PANEL -->
-            <div class="setup-panel" id="setup-panel">
-                <div class="setup-card">
-                    <div class="setup-card-header">
-                        <h2 class="setup-card-title">Configure Practice Session</h2>
-                        <p class="setup-card-subtitle">Choose your domain, side, and case problem to initiate moot court simulation</p>
-                    </div>
-
-                    <!-- Domain Selection -->
-                    <div class="setup-row">
-                        <div class="setup-header-badge">
-                            <span class="badge-num">1</span>
-                            <span class="badge-label">SELECT LEGAL DOMAIN</span>
-                        </div>
-                        <div class="domain-grid">
-                            <button class="domain-btn domain-con active" data-domain="Constitutional Law" data-code="CON" onclick="selectDomain(this)">
-                                <div class="domain-icon-wrapper">🏛️</div>
-                                <span class="domain-name">Constitutional Law</span>
-                                <span class="domain-code-pill">CON</span>
-                            </button>
-                            <button class="domain-btn domain-crl" data-domain="Criminal Law" data-code="CRL" onclick="selectDomain(this)">
-                                <div class="domain-icon-wrapper">🔒</div>
-                                <span class="domain-name">Criminal Law</span>
-                                <span class="domain-code-pill">CRL</span>
-                            </button>
-                            <button class="domain-btn domain-com" data-domain="Commercial Law" data-code="COM" onclick="selectDomain(this)">
-                                <div class="domain-icon-wrapper">💼</div>
-                                <span class="domain-name">Commercial Law</span>
-                                <span class="domain-code-pill">COM</span>
-                            </button>
-                            <button class="domain-btn domain-ipr" data-domain="Intellectual Property" data-code="IPR" onclick="selectDomain(this)">
-                                <div class="domain-icon-wrapper">💡</div>
-                                <span class="domain-name">Intellectual Property</span>
-                                <span class="domain-code-pill">IPR</span>
-                            </button>
-                            <button class="domain-btn domain-fam" data-domain="Family Law" data-code="FAM" onclick="selectDomain(this)">
-                                <div class="domain-icon-wrapper">⚖️</div>
-                                <span class="domain-name">Family Law</span>
-                                <span class="domain-code-pill">FAM</span>
-                            </button>
-                            <button class="domain-btn domain-env" data-domain="Environmental Law" data-code="ENV" onclick="selectDomain(this)">
-                                <div class="domain-icon-wrapper">🌿</div>
-                                <span class="domain-name">Environmental Law</span>
-                                <span class="domain-code-pill">ENV</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Side Selection -->
-                    <div class="setup-row">
-                        <div class="setup-header-badge">
-                            <span class="badge-num">2</span>
-                            <span class="badge-label">SELECT YOUR SIDE</span>
-                        </div>
-                        <div class="side-cards-grid">
-                            <div class="side-card active" id="petitionerBtn" onclick="selectSide('petitioner')">
-                                <div class="side-icon-wrapper">📜</div>
-                                <div>
-                                    <h4 class="side-title">Petitioner / Appellant</h4>
-                                    <p class="side-desc">Argue to overturn lower ruling</p>
-                                </div>
-                            </div>
-                            <div class="side-card" id="respondentBtn" onclick="selectSide('respondent')">
-                                <div class="side-icon-wrapper">🛡️</div>
-                                <div>
-                                    <h4 class="side-title">Respondent / Appellee</h4>
-                                    <p class="side-desc">Defend lower court decision</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Case Problem Section -->
-                    <div class="setup-row">
-                        <div class="setup-header-badge">
-                            <span class="badge-num">3</span>
-                            <span class="badge-label">PROVIDE CASE PROBLEM</span>
-                        </div>
-                        <div class="problem-source-card">
-                            <button class="generate-btn" id="generate-problem-btn" onclick="generateRandomProblem()">
-                                ✨ Generate AI Moot Proposition
-                            </button>
-                            <div class="divider-row">
-                                <div class="divider-line"></div>
-                                <span class="divider-text">OR UPLOAD FILE</span>
-                                <div class="divider-line"></div>
-                            </div>
-                            <div class="upload-zone upload-area" id="upload-zone">
-                                <div class="upload-icon">📁</div>
-                                <p class="upload-title">Upload Case File (PDF, DOCX, TXT)</p>
-                                <p class="upload-sub">Drag & drop or click to upload</p>
-                            </div>
-                            <input type="file" id="file-input" accept=".pdf,.docx,.txt" style="display:none">
-                            <div class="divider-row">
-                                <div class="divider-line"></div>
-                                <span class="divider-text">OR PASTE CUSTOM TEXT</span>
-                                <div class="divider-line"></div>
-                            </div>
-                            <textarea id="custom-problem" class="problem-textarea" placeholder="Paste custom moot proposition text here..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="problem-display" id="problem-display"></div>
-                    
-                    <button class="start-btn" id="start-session-btn" onclick="startSession()">
-                        🚀 Start Practice Session →
-                    </button>
-                </div>
-            </div>
-
-            <!-- CHAT INTERFACE -->
-            <div class="chat-window" id="chat-window" style="display:none"></div>
-
-            <!-- INPUT AREA -->
-            <div class="input-area" id="input-area" style="display:none">
-                <input type="text" id="user-input" placeholder="Type your legal argument, cite precedents, or respond to bench query..." />
-                <button class="send-btn" id="send-btn" onclick="sendMessage()">Send Argument →</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- EVALUATION MODAL -->
-    <div id="evaluation-modal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="document.getElementById('evaluation-modal').style.display='none'">✕</button>
-            <div id="evaluation-body"></div>
-        </div>
-    </div>
-
-    <!-- USER SETTINGS MODAL -->
-    <div class="modal-overlay" id="user-settings-modal">
-        <div class="user-settings-card">
-            <div class="user-settings-header">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 24px;">⚙️</span>
-                    <div>
-                        <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--gold);">Settings</h2>
-                        <p style="font-size: 12px; color: var(--subtext); margin: 0;">Manage your account, preferences, and data</p>
-                    </div>
-                </div>
-                <button class="modal-close-x" onclick="closeUserSettingsModal()">✕</button>
-            </div>
-
-            <div class="user-settings-body">
-                <!-- SECTION 1: ACCOUNT -->
-                <div class="settings-group">
-                    <h3 class="settings-group-title">Account Profile</h3>
-                    <div class="user-profile-header-card">
-                        <div class="avatar-circle-lg" id="settings-user-avatar">U</div>
-                        <div class="user-profile-details">
-                            <p class="user-profile-name" id="settings-user-name">User Name</p>
-                            <p class="user-profile-email" id="settings-user-email">user@example.com</p>
-                            <div class="user-profile-badges">
-                                <span class="badge-account-type" id="settings-account-type">Email Account</span>
-                                <span class="user-joined-date" id="settings-user-joined">Member</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="settings-change-password-box" style="margin-top: 12px;">
-                        <button class="btn-settings-action" onclick="handlePasswordReset()">🔒 Send Password Reset Email</button>
-                    </div>
-                </div>
-
-                <!-- SECTION 2: PREFERENCES -->
-                <div class="settings-group">
-                    <h3 class="settings-group-title">Preferences</h3>
-                    <div class="settings-row-item">
-                        <div>
-                            <div class="settings-row-label">Appearance Theme</div>
-                            <div class="settings-row-sub">Switch between Dark and Light color themes</div>
-                        </div>
-                        <button class="btn-settings-action" onclick="toggleTheme()">☀️ / 🌙 Toggle Theme</button>
-                    </div>
-                    <div class="settings-row-item">
-                        <div>
-                            <div class="settings-row-label">Local Practice Storage</div>
-                            <div class="settings-row-sub">Clear offline guest sessions saved on this device</div>
-                        </div>
-                        <button class="btn-settings-action danger" onclick="handleClearLocalSessions()">🗑️ Clear Local Sessions</button>
-                    </div>
-                </div>
-
-                <!-- SECTION 3: DATA & PRIVACY -->
-                <div class="settings-group">
-                    <h3 class="settings-group-title">Data & Privacy</h3>
-                    <div class="settings-row-item">
-                        <div>
-                            <div class="settings-row-label">Export My Practice Data</div>
-                            <div class="settings-row-sub">Download all your chat history and moot court sessions as JSON</div>
-                        </div>
-                        <button class="btn-settings-action" onclick="handleDownloadUserData()">📥 Download My Data</button>
-                    </div>
-                    <p class="privacy-note-text">
-                        🔒 We store your practice sessions, messages, and evaluation results to help you track your progress.
-                    </p>
-                </div>
-
-                <!-- SECTION 4: ACCOUNT ACTIONS -->
-                <div class="settings-group danger-group">
-                    <h3 class="settings-group-title danger">Account Actions</h3>
-                    <div class="settings-actions-flex">
-                        <button class="btn-settings-action danger-outline" onclick="logout()">↩ Logout</button>
-                        <button class="btn-settings-action danger" id="delete-account-btn" onclick="handleRequestAccountDeletion()">⚠️ Delete My Account</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+            if (statsBar) statsObserver.observe(statsBar);
+        });
+    </script>
 </body>
 
 </html>

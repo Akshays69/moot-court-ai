@@ -42,7 +42,7 @@ function showAccessDenied() {
     if (deniedEl) deniedEl.style.display = 'block';
 
     setTimeout(() => {
-        window.location.href = 'index.html';
+        window.location.href = 'app.html';
     }, 2000);
 }
 

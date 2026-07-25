@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Check if user is already logged in as guest
     const isGuest = localStorage.getItem('mootcourt_is_guest') === 'true';
     if (isGuest) {
-        window.location.href = 'index.html';
+        window.location.href = 'app.html';
         return;
     }
 
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const user = await getCurrentUser();
             if (user) {
-                window.location.href = 'index.html';
+                window.location.href = 'app.html';
                 return;
             }
         } catch (e) {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3. Check for OAuth callback token in URL hash
     const hash = window.location.hash;
     if (hash && hash.includes('access_token')) {
-        window.location.href = 'index.html';
+        window.location.href = 'app.html';
         return;
     }
 
@@ -126,7 +126,7 @@ async function handleEmailLogin(e) {
         }
 
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'app.html';
         }, 1000);
 
     } catch (err) {
@@ -219,7 +219,7 @@ async function handleEmailSignup(e) {
         }
 
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'app.html';
         }, 1500);
 
     } catch (err) {
@@ -252,7 +252,7 @@ async function handleGoogleLogin() {
         const { data, error } = await supabaseClient.auth.signInWithOAuth({
             provider: 'google',
             options: {
-                redirectTo: window.location.origin + '/index.html'
+                redirectTo: window.location.origin + '/app.html'
             }
         });
 
@@ -289,7 +289,7 @@ function handleGuestLogin() {
 
     localStorage.setItem('mootcourt_user', JSON.stringify(guestUser));
     localStorage.setItem('mootcourt_is_guest', 'true');
-    window.location.href = 'index.html';
+    window.location.href = 'app.html';
 }
 
 // ═════════════════════════════════════════════════════════════
