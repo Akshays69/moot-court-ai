@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import os
 import json
 from supabase import create_client, Client
-from backend.prompts import get_judge_prompt, get_lawyer_prompt, get_problem_prompt, EVALUATOR_PROMPT
+from prompts import get_judge_prompt, get_lawyer_prompt, get_problem_prompt, EVALUATOR_PROMPT
 
 load_dotenv()
 
