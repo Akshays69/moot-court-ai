@@ -198,7 +198,7 @@ async function generateProblem() {
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
-    const BACKEND_URL = 'http://localhost:8000';
+    const BACKEND_URL = 'https://moot-court-ai-gp94.onrender.com';
     const response = await fetch(`${BACKEND_URL}/generate-problem`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -438,7 +438,7 @@ async function startSession() {
     startBtn.disabled = false;
   }
 
-  const BACKEND_URL = 'http://localhost:8000';
+  const BACKEND_URL = 'https://moot-court-ai-gp94.onrender.com';
   fetch(`${BACKEND_URL}/reset`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }
@@ -463,7 +463,7 @@ function startNewChat() {
   showSetupPanel();
   renderSessionsList();
 
-  const BACKEND_URL = 'http://localhost:8000';
+  const BACKEND_URL = 'https://moot-court-ai-gp94.onrender.com';
   fetch(`${BACKEND_URL}/reset`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' }
@@ -944,7 +944,7 @@ async function sendMessage() {
   let fullResponse = '';
 
   try {
-    const BACKEND_URL = 'http://localhost:8000';
+    const BACKEND_URL = 'https://moot-court-ai-gp94.onrender.com';
 
     const response = await fetch(`${BACKEND_URL}/api/chat/stream`, {
       method: 'POST',
@@ -1046,7 +1046,7 @@ async function evaluateSession() {
   showEvaluationLoading();
 
   try {
-    const BACKEND_URL = 'http://localhost:8000';
+    const BACKEND_URL = 'https://moot-court-ai-gp94.onrender.com';
 
     const response = await fetch(
       `${BACKEND_URL}/evaluate`, {
