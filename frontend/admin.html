@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moot Court AI — Admin Panel</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="admin.css">
+
+    <!-- Script tags in exact required order -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="theme.js"></script>
+    <!-- Marked.js for Markdown Rendering in Chat Viewer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="admin.js"></script>
+</head>
+
+<body>
+
+    <div class="admin-sidebar-overlay" id="admin-sidebar-overlay" onclick="closeAdminSidebar()"></div>
+
+    <!-- NAVBAR -->
+    <nav class="admin-navbar">
+        <button class="mobile-menu-toggle" onclick="toggleAdminSidebar()" aria-label="Toggle Admin Sidebar">☰</button>
+
+        <a href="index.html" class="brand-logo" title="Back to Moot Court AI Workspace">
+            <span class="brand-icon">⚖️</span>
+            <span class="brand-title">Moot Court AI</span>
+        </a>
+
+        <div class="admin-badge-top">
+            👑 Admin Panel
+        </div>
+
+        <div class="nav-right">
+            <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">☀️</button>
+            <a href="index.html" class="back-app-link">← Back to App</a>
+            <button class="logout-btn" onclick="logoutAdmin()">↩ Logout</button>
+        </div>
+    </nav>
+
+    <!-- MAIN WRAPPER -->
+    <div class="admin-app">
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+            <button class="sidebar-tab active" id="tab-dashboard" onclick="switchAdminTab('dashboard')">
+                <span>📊</span> Dashboard
+            </button>
+            <button class="sidebar-tab" id="tab-users" onclick="switchAdminTab('users')">
+                <span>👥</span> Users
+            </button>
+            <button class="sidebar-tab" id="tab-sessions" onclick="switchAdminTab('sessions')">
+                <span>💬</span> All Sessions
+            </button>
+            <button class="sidebar-tab" id="tab-settings" onclick="switchAdminTab('settings')">
+                <span>⚙️</span> Settings
+            </button>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="admin-main">
+
+            <!-- ACCESS DENIED BANNER -->
+            <div id="access-denied" style="display:none; text-align:center; padding: 60px 20px;">
+                <h1 style="color: #f87171; font-size: 2.2rem; margin-bottom: 12px;">Access Denied — Admins Only</h1>
+                <p style="color: var(--subtext); font-size: 1.1rem;">You do not have administrative privileges. Redirecting to workspace...</p>
+            </div>
+
+            <!-- TAB 1: DASHBOARD -->
+            <div class="tab-content active" id="dashboard-section">
+                <h1 class="page-title">Dashboard Overview</h1>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-num" id="stat-total-users">0</div>
+                        </div>
+                        <span class="stat-icon">👥</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Admins</div>
+                            <div class="stat-num" id="stat-admins">0</div>
+                        </div>
+                        <span class="stat-icon">👑</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Deactivated</div>
+                            <div class="stat-num" id="stat-deactivated">0</div>
+                        </div>
+                        <span class="stat-icon">🚫</span>
+                    </div>
+
+                    <div class="stat-card">
+                        <div>
+                            <div class="stat-label">Total Sessions</div>
+                            <div class="stat-num" id="stat-total-sessions">0</div>
+                        </div>
+                        <span class="stat-icon">💬</span>
+                    </div>
+                </div>
+
+                <h2 style="font-size: 1.3rem; margin-bottom: 16px; color: var(--gold);">Recent Signups</h2>
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Joined Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-signups-body">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: USERS TABLE -->
+            <div class="tab-content" id="users-section">
+                <h1 class="page-title">User Management</h1>
+
+                <div class="table-header-bar">
+                    <input type="text" id="user-search" class="search-input" placeholder="Search users by name or email..." oninput="filterUsersTable()" />
+                    <select id="user-filter" class="filter-select" onchange="filterUsersTable()">
+                        <option value="all">All Users</option>
+                        <option value="admins">Admins Only</option>
+                        <option value="users">Regular Users</option>
+                        <option value="deactivated">Deactivated Users</option>
+                    </select>
+                </div>
+
+                <div class="users-table-wrapper admin-table-wrapper">
+                    <table class="admin-table users-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Last Login</th>
+                                <th class="actions-cell">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: ALL SESSIONS TABLE -->
+            <div class="tab-content" id="sessions-section">
+                <h1 class="page-title">All Moot Practice Sessions</h1>
+
+                <!-- SESSIONS FILTER BAR -->
+                <div class="sessions-filter-container">
+                    <div class="sessions-filter-row">
+                        <!-- 1. USER SEARCH -->
+                        <div class="filter-group flex-2">
+                            <input type="text" id="session-search-input" class="filter-input" placeholder="Search by user name or email..." />
+                        </div>
+
+                        <!-- 2. DOMAIN FILTER -->
+                        <div class="filter-group">
+                            <select id="session-domain-select" class="filter-select">
+                                <option value="all">All Domains</option>
+                                <option value="Constitutional Law">Constitutional Law</option>
+                                <option value="Criminal Law">Criminal Law</option>
+                                <option value="Commercial Law">Commercial Law</option>
+                                <option value="Intellectual Property">Intellectual Property</option>
+                                <option value="Family Law">Family Law</option>
+                                <option value="Environmental Law">Environmental Law</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. SIDE FILTER -->
+                        <div class="filter-group">
+                            <select id="session-side-select" class="filter-select">
+                                <option value="all">All Sides</option>
+                                <option value="petitioner">Petitioner</option>
+                                <option value="respondent">Respondent</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. DATE FILTER + GRANULARITY -->
+                        <div class="filter-group date-filter-group">
+                            <input type="date" id="session-date-input" class="filter-input filter-date" title="Select filter date" />
+                            <select id="session-date-mode" class="filter-select filter-date-mode" title="Date granularity">
+                                <option value="exact">Exact Date</option>
+                                <option value="month">This Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                            <button type="button" class="btn-clear-date" id="btn-clear-date" onclick="clearDateFilter()" title="Clear date filter">✕</button>
+                        </div>
+
+                        <!-- RESET ALL BUTTON -->
+                        <button type="button" class="btn-reset-filters" onclick="resetAllSessionFilters()">
+                            🔄 Reset All Filters
+                        </button>
+                    </div>
+
+                    <!-- RESULT COUNT HEADER -->
+                    <div class="filter-stats-row">
+                        <span id="sessions-count-label" class="sessions-count-label">Showing 0 of 0 sessions</span>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Domain</th>
+                                <th>Side</th>
+                                <th>Started Date</th>
+                                <th>Message Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-table-body">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 4: SETTINGS SECTION -->
+            <div class="tab-content" id="settings-section">
+                <h1 class="page-title">System Settings</h1>
+                
+                <div class="settings-grid">
+                    <!-- SECTION 1: DATABASE ACCESS -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <span class="settings-card-icon">🗄️</span>
+                            <div>
+                                <h3 class="settings-card-title">Database Management</h3>
+                                <p class="settings-card-sub">Direct access to Supabase database tables & policies</p>
+                            </div>
+                        </div>
+                        <p style="font-size: 13.5px; color: var(--subtext); margin-bottom: 20px; line-height: 1.6;">
+                            Access the full database directly in Supabase to view sessions, messages, evaluations, and manage data at the source level.
+                        </p>
+                        <a href="https://supabase.com/dashboard/project/wjfemhpaqcqbqipxnnzp" target="_blank" rel="noopener noreferrer" class="btn-action btn-gold-solid">
+                            🔗 Open Supabase Dashboard ↗
+                        </a>
+                    </div>
+
+                    <!-- SECTION 2: APPLICATION INFO -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <span class="settings-card-icon">📊</span>
+                            <div>
+                                <h3 class="settings-card-title">Application Metrics</h3>
+                                <p class="settings-card-sub">Live environment data & usage stats</p>
+                            </div>
+                        </div>
+                        <div class="settings-stats-mini-grid">
+                            <div class="settings-stat-box">
+                                <span class="settings-stat-val" id="settings-stat-users">0</span>
+                                <span class="settings-stat-lbl">Registered Users</span>
+                            </div>
+                            <div class="settings-stat-box">
+                                <span class="settings-stat-val" id="settings-stat-sessions">0</span>
+                                <span class="settings-stat-lbl">Total Sessions</span>
+                            </div>
+                            <div class="settings-stat-box">
+                                <span class="settings-stat-val" id="settings-stat-messages">0</span>
+                                <span class="settings-stat-lbl">Total Messages</span>
+                            </div>
+                            <div class="settings-stat-box">
+                                <span class="settings-stat-val" style="color: var(--gold); font-size: 1.1rem;">V1.1</span>
+                                <span class="settings-stat-lbl">App Version</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: ADMIN ACCOUNTS -->
+                    <div class="settings-card" style="grid-column: span 2;">
+                        <div class="settings-card-header">
+                            <span class="settings-card-icon">👑</span>
+                            <div>
+                                <h3 class="settings-card-title">Admin Accounts</h3>
+                                <p class="settings-card-sub">Users with administrator privileges</p>
+                            </div>
+                        </div>
+                        <div id="admin-accounts-list" class="admin-accounts-list">
+                            <!-- Dynamic Admin Users List -->
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: DANGER ZONE -->
+                    <div class="settings-card danger-card" style="grid-column: span 2;">
+                        <div class="settings-card-header">
+                            <span class="settings-card-icon">⚠️</span>
+                            <div>
+                                <h3 class="settings-card-title" style="color: #ef4444;">Danger Zone</h3>
+                                <p class="settings-card-sub">Administrative data exports & audit controls</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                            <div>
+                                <p style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px;">System Profiles Data Export</p>
+                                <p style="font-size: 12px; color: var(--subtext);">Download a JSON file containing all profile records for backup.</p>
+                            </div>
+                            <button class="btn-action btn-danger-solid" onclick="exportAllUserData()">📥 Export All User Data (JSON)</button>
+                        </div>
+                        <p style="font-size: 11px; color: #ef4444; opacity: 0.8; margin-top: 14px;">
+                            🔒 Use this data responsibly and in compliance with privacy regulations.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-card">
+            <div class="modal-icon-circle" id="confirm-modal-icon-circle">
+                <span id="confirm-modal-icon">⚠️</span>
+            </div>
+            <h3 class="modal-title-centered" id="confirm-modal-title">Confirm Action</h3>
+            <p class="modal-msg-centered" id="confirm-modal-msg">Are you sure you want to proceed?</p>
+            <div class="modal-actions-row">
+                <button type="button" class="modal-btn-cancel" id="confirm-modal-cancel">Cancel</button>
+                <button type="button" class="modal-btn-confirm" id="confirm-modal-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

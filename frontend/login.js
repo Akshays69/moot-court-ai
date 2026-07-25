@@ -1,116 +1,360 @@
-// Check if already logged in
-window.onload = function () {
-    const user = JSON.parse(localStorage.getItem('mootUser'));
-    if (user) {
+// ═════════════════════════════════════════════════════════════
+// MOOT COURT AI — AUTHENTICATION HANDLER (SUPABASE + GUEST)
+// ═════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Check if user is already logged in as guest
+    const isGuest = localStorage.getItem('mootcourt_is_guest') === 'true';
+    if (isGuest) {
         window.location.href = 'index.html';
+        return;
     }
-};
 
-// Google Login Handler
-function handleGoogleLogin(response) {
-    const token = response.credential;
-    const payload = parseJwt(token);
+    // 2. Check if user is already logged in via Supabase
+    if (typeof getCurrentUser === 'function') {
+        try {
+            const user = await getCurrentUser();
+            if (user) {
+                window.location.href = 'index.html';
+                return;
+            }
+        } catch (e) {
+            console.warn('Supabase auth check deferred:', e);
+        }
+    }
 
-    const user = {
-        name: payload.name,
-        email: payload.email,
-        picture: payload.picture,
-        loginType: 'google'
-    };
+    // 3. Check for OAuth callback token in URL hash
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token')) {
+        window.location.href = 'index.html';
+        return;
+    }
 
-    localStorage.setItem('mootUser', JSON.stringify(user));
-    window.location.href = 'index.html';
+    // 4. Initialize event listeners
+    initAuthEventListeners();
+});
+
+function initAuthEventListeners() {
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleEmailLogin);
+    }
+
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', handleEmailSignup);
+    }
+
+    const googleBtn = document.getElementById('google-btn');
+    if (googleBtn) {
+        googleBtn.addEventListener('click', handleGoogleLogin);
+    }
+
+    const guestBtn = document.getElementById('guest-btn');
+    if (guestBtn) {
+        guestBtn.addEventListener('click', handleGuestLogin);
+    }
+
+    // Password Toggle Listeners
+    document.querySelectorAll('.toggle-password-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = btn.getAttribute('data-target');
+            if (targetId) togglePasswordVisibility(targetId, btn);
+        });
+    });
 }
 
-// Parse Google JWT token
-function parseJwt(token) {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    const json = decodeURIComponent(atob(base64).split('').map(c =>
-        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-    ).join(''));
-    return JSON.parse(json);
-}
+// ═════════════════════════════════════════════════════════════
+// EMAIL LOGIN
+// ═════════════════════════════════════════════════════════════
 
-// Email Login
-function handleEmailLogin() {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value.trim();
-    const errorEl = document.getElementById('login-error');
+async function handleEmailLogin(e) {
+    if (e) e.preventDefault();
+    clearErrors();
+
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    const btn = document.getElementById('login-btn');
+
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value.trim() : '';
 
     if (!email || !password) {
-        showError(errorEl, 'Please enter your email and password.');
+        showError('login-error', 'Please enter your email and password.');
         return;
     }
 
-    const users = JSON.parse(localStorage.getItem('mootUsers')) || [];
-    const user = users.find(u => u.email === email && u.password === password);
+    if (btn) {
+        btn.textContent = 'Signing in...';
+        btn.classList.add('btn-loading');
+        btn.disabled = true;
+    }
 
-    if (!user) {
-        showError(errorEl, 'Invalid email or password. Please try again.');
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            let msg = error.message;
+            if (error.message.includes('Invalid login credentials')) {
+                msg = 'Wrong email or password. Try again.';
+            } else if (error.message.includes('Email not confirmed')) {
+                msg = 'Please check your email to confirm your account.';
+            }
+            showError('login-error', msg);
+
+            if (btn) {
+                btn.textContent = 'Sign In →';
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+            }
+            return;
+        }
+
+        // Login successful — clear guest status
+        localStorage.removeItem('mootcourt_is_guest');
+        localStorage.removeItem('mootcourt_user');
+
+        const errEl = document.getElementById('login-error');
+        if (errEl) {
+            errEl.className = 'success-msg';
+            errEl.textContent = 'Welcome back! Redirecting...';
+            errEl.style.display = 'block';
+        }
+
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+
+    } catch (err) {
+        showError('login-error', err.message || 'An unexpected error occurred.');
+        if (btn) {
+            btn.textContent = 'Sign In →';
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════
+// EMAIL SIGN UP
+// ═════════════════════════════════════════════════════════════
+
+async function handleEmailSignup(e) {
+    if (e) e.preventDefault();
+    clearErrors();
+
+    const nameInput = document.getElementById('signup-name');
+    const emailInput = document.getElementById('signup-email');
+    const passwordInput = document.getElementById('signup-password');
+    const confirmInput = document.getElementById('signup-confirm');
+    const btn = document.getElementById('signup-btn');
+
+    const name = nameInput ? nameInput.value.trim() : '';
+    const email = emailInput ? emailInput.value.trim() : '';
+    const password = passwordInput ? passwordInput.value.trim() : '';
+    const confirm = confirmInput ? confirmInput.value.trim() : '';
+
+    if (!name) {
+        showError('signup-error', 'Please enter your name.');
         return;
     }
 
-    localStorage.setItem('mootUser', JSON.stringify({
-        name: user.name,
-        email: user.email,
-        loginType: 'email'
-    }));
+    if (!email) {
+        showError('signup-error', 'Please enter a valid email address.');
+        return;
+    }
 
+    if (!password || password.length < 6) {
+        showError('signup-error', 'Password must be at least 6 characters.');
+        return;
+    }
+
+    if (password !== confirm) {
+        showError('signup-error', 'Passwords do not match.');
+        return;
+    }
+
+    if (btn) {
+        btn.textContent = 'Creating Account...';
+        btn.classList.add('btn-loading');
+        btn.disabled = true;
+    }
+
+    try {
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    full_name: name
+                }
+            }
+        });
+
+        if (error) {
+            showError('signup-error', error.message);
+            if (btn) {
+                btn.textContent = 'Create Account →';
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+            }
+            return;
+        }
+
+        // Signup successful
+        localStorage.removeItem('mootcourt_is_guest');
+        localStorage.removeItem('mootcourt_user');
+
+        const signupForm = document.getElementById('signup-form');
+        if (signupForm) signupForm.style.display = 'none';
+
+        const successEl = document.getElementById('signup-success');
+        if (successEl) {
+            successEl.textContent = '✅ Account created successfully! Signing you in...';
+            successEl.style.display = 'block';
+        }
+
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1500);
+
+    } catch (err) {
+        showError('signup-error', err.message || 'An unexpected error occurred.');
+        if (btn) {
+            btn.textContent = 'Create Account →';
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════
+// GOOGLE LOGIN
+// ═════════════════════════════════════════════════════════════
+
+async function handleGoogleLogin() {
+    clearErrors();
+    const btn = document.getElementById('google-btn');
+    if (btn) {
+        btn.textContent = 'Connecting to Google...';
+        btn.classList.add('btn-loading');
+        btn.disabled = true;
+    }
+
+    try {
+        localStorage.removeItem('mootcourt_is_guest');
+        localStorage.removeItem('mootcourt_user');
+
+        const { data, error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: window.location.origin + '/index.html'
+            }
+        });
+
+        if (error) {
+            showError('login-error', error.message);
+            if (btn) {
+                btn.textContent = 'Continue with Google';
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+            }
+        }
+    } catch (err) {
+        showError('login-error', err.message || 'Failed to connect to Google.');
+        if (btn) {
+            btn.textContent = 'Continue with Google';
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+        }
+    }
+}
+
+// ═════════════════════════════════════════════════════════════
+// GUEST LOGIN
+// ═════════════════════════════════════════════════════════════
+
+function handleGuestLogin() {
+    clearErrors();
+    const guestUser = {
+        id: 'guest_' + Date.now(),
+        name: 'Guest',
+        email: 'guest@mootcourt.ai',
+        isGuest: true
+    };
+
+    localStorage.setItem('mootcourt_user', JSON.stringify(guestUser));
+    localStorage.setItem('mootcourt_is_guest', 'true');
     window.location.href = 'index.html';
 }
 
-// Register
-function handleRegister() {
-    const name = document.getElementById('reg-name').value.trim();
-    const email = document.getElementById('reg-email').value.trim();
-    const password = document.getElementById('reg-password').value.trim();
-    const errorEl = document.getElementById('register-error');
+// ═════════════════════════════════════════════════════════════
+// SHOW / HIDE PASSWORD TOGGLE
+// ═════════════════════════════════════════════════════════════
 
-    if (!name || !email || !password) {
-        showError(errorEl, 'Please fill in all fields.');
-        return;
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (btn) btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        if (btn) btn.textContent = '👁';
     }
-
-    if (password.length < 6) {
-        showError(errorEl, 'Password must be at least 6 characters.');
-        return;
-    }
-
-    const users = JSON.parse(localStorage.getItem('mootUsers')) || [];
-    const exists = users.find(u => u.email === email);
-
-    if (exists) {
-        showError(errorEl, 'An account with this email already exists.');
-        return;
-    }
-
-    users.push({ name, email, password });
-    localStorage.setItem('mootUsers', JSON.stringify(users));
-
-    localStorage.setItem('mootUser', JSON.stringify({
-        name,
-        email,
-        loginType: 'email'
-    }));
-
-    window.location.href = 'index.html';
 }
 
-// Show register card
-function showRegister() {
-    document.querySelector('.login-card').style.display = 'none';
-    document.getElementById('register-card').style.display = 'flex';
+// ═════════════════════════════════════════════════════════════
+// FORM TOGGLE (LOGIN / SIGNUP)
+// ═════════════════════════════════════════════════════════════
+
+function showSignup() {
+    const loginSec = document.getElementById('login-section');
+    const signupSec = document.getElementById('signup-section');
+    const signupForm = document.getElementById('signup-form');
+
+    if (loginSec) loginSec.style.display = 'none';
+    if (signupSec) signupSec.style.display = 'block';
+    if (signupForm) signupForm.style.display = 'block';
+
+    clearErrors();
+    const nameInput = document.getElementById('signup-name');
+    if (nameInput) nameInput.focus();
 }
 
-// Show login card
 function showLogin() {
-    document.querySelector('.login-card').style.display = 'flex';
-    document.getElementById('register-card').style.display = 'none';
+    const loginSec = document.getElementById('login-section');
+    const signupSec = document.getElementById('signup-section');
+
+    if (signupSec) signupSec.style.display = 'none';
+    if (loginSec) loginSec.style.display = 'block';
+
+    clearErrors();
+    const emailInput = document.getElementById('login-email');
+    if (emailInput) emailInput.focus();
 }
 
-// Show error message
-function showError(el, msg) {
-    el.innerText = msg;
-    el.style.display = 'block';
-    setTimeout(() => { el.style.display = 'none'; }, 4000);
+// ═════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═════════════════════════════════════════════════════════════
+
+function showError(elementId, message) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.className = 'error-msg';
+        el.textContent = message;
+        el.style.display = 'block';
+    }
+}
+
+function clearErrors() {
+    const errors = document.querySelectorAll('.error-msg, .success-msg');
+    errors.forEach(e => {
+        e.textContent = '';
+        e.style.display = 'none';
+    });
 }
