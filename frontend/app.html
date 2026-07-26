@@ -58,14 +58,17 @@
         <div class="sidebar">
             <button class="sidebar-close-btn" id="sidebar-close-btn" onclick="closeMobileSidebar()" aria-label="Close Sidebar">✕</button>
 
-            <!-- Sidebar Header Row -->
-            <div class="sidebar-header-row">
-                <a href="index.html" class="sidebar-brand" title="Click to view Landing Page">
+            <!-- Sidebar Header Block -->
+            <div class="sidebar-header-block">
+                <div class="sidebar-brand-title-row">
                     <div class="brand-icon">⚖️</div>
                     <div class="brand-text">
                         <p class="brand-name">Moot Court AI</p>
-                        <p class="brand-sub">← Landing Page</p>
                     </div>
+                </div>
+
+                <a href="index.html" class="btn-back-landing" title="Back to Homepage / Landing Page">
+                    <span>←</span> Landing Page
                 </a>
             </div>
 
@@ -235,7 +238,7 @@
                             <span class="badge-label">PROVIDE CASE PROBLEM</span>
                         </div>
                         <div class="problem-source-card">
-                            <button class="generate-btn" id="generate-problem-btn" onclick="generateRandomProblem()">
+                            <button class="generate-btn" id="generate-problem-btn" onclick="generateProblem()">
                                 ✨ Generate AI Moot Proposition
                             </button>
                             <div class="divider-row">

@@ -28,20 +28,22 @@
 
     <!-- NAVBAR -->
     <nav class="admin-navbar">
-        <button class="mobile-menu-toggle" onclick="toggleAdminSidebar()" aria-label="Toggle Admin Sidebar">☰</button>
-
-        <a href="app.html" class="brand-logo" title="Back to Moot Court AI Workspace">
-            <span class="brand-icon">⚖️</span>
-            <span class="brand-title">Moot Court AI</span>
-        </a>
-
-        <div class="admin-badge-top">
-            👑 Admin Panel
+        <div class="nav-left-group">
+            <button class="mobile-menu-toggle" onclick="toggleAdminSidebar()" aria-label="Toggle Admin Sidebar">☰</button>
+            <a href="app.html" class="back-app-btn" title="Back to Moot Court AI Workspace">
+                <span>←</span> Back to App
+            </a>
+            <a href="app.html" class="brand-logo" title="Back to Moot Court AI Workspace">
+                <span class="brand-icon">⚖️</span>
+                <span class="brand-title">Moot Court AI</span>
+            </a>
         </div>
 
         <div class="nav-right">
+            <div class="admin-badge-top">
+                👑 Admin Panel
+            </div>
             <button class="btn-theme" id="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">☀️</button>
-            <a href="app.html" class="back-app-link">← Back to App</a>
             <button class="logout-btn" onclick="logoutAdmin()">↩ Logout</button>
         </div>
     </nav>

@@ -86,18 +86,18 @@ body {
     border-right: 1px solid var(--sidebar-border);
 }
 
-.sidebar-brand {
-    padding: 20px 18px;
+.sidebar-header-block {
+    padding: 18px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(15, 31, 61, 0.08), rgba(45, 27, 105, 0.08));
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-brand-title-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid var(--border);
-    text-decoration: none;
-    background: linear-gradient(135deg, rgba(15, 31, 61, 0.08), rgba(45, 27, 105, 0.08));
-}
-
-.sidebar-brand:hover {
-    background: rgba(240, 165, 0, 0.08);
 }
 
 .brand-icon {
@@ -121,10 +121,40 @@ body {
     margin: 0;
 }
 
-.brand-sub {
-    font-size: 11px;
-    color: var(--subtext);
-    margin: 2px 0 0 0;
+.btn-back-landing {
+    margin-top: 14px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.btn-back-landing:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: var(--gold, #f0a500);
+}
+
+[data-theme="light"] .btn-back-landing {
+    border-color: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+}
+
+[data-theme="light"] .btn-back-landing:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: var(--gold, #f0a500);
+    color: var(--gold, #f0a500);
 }
 
 .mode-tabs {
@@ -422,6 +452,11 @@ body {
 }
 
 .generate-btn {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 14px;
     border-radius: 12px;
     border: 1px solid var(--gold);
@@ -431,6 +466,7 @@ body {
     font-weight: 700;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
 }
 
 .generate-btn:hover {

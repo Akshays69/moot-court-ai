@@ -13,6 +13,11 @@ function closeMobileSidebar() {
   if (overlay) overlay.classList.remove('open');
 }
 
+// Global Active Session State Variables
+let currentDomain = 'Constitutional Law';
+let currentSide = 'petitioner';
+let currentMode = 'judge';
+
 const DOMAIN_CODES = {
   'Constitutional Law': 'CON',
   'Criminal Law': 'CRL',
@@ -186,7 +191,7 @@ async function generateProblem() {
     localStorage.setItem('mootcourt_guest_generations', String(count + 1));
   }
 
-  const btn = document.getElementById('generateBtn');
+  const btn = document.getElementById('generate-problem-btn') || document.getElementById('generateBtn');
   const display = document.getElementById('problem-display');
 
   if (btn) {
@@ -199,10 +204,13 @@ async function generateProblem() {
 
   try {
     const BACKEND_URL = 'https://moot-court-ai-gp94.onrender.com';
+    const domainToUse = typeof currentDomain !== 'undefined' && currentDomain ? currentDomain : 'Constitutional Law';
+    const sideToUse = typeof currentSide !== 'undefined' && currentSide ? currentSide : 'petitioner';
+
     const response = await fetch(`${BACKEND_URL}/generate-problem`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain: currentDomain, side: currentSide }),
+      body: JSON.stringify({ domain: domainToUse, side: sideToUse }),
       signal: controller.signal
     });
 
@@ -236,6 +244,8 @@ async function generateProblem() {
     }
   }
 }
+
+window.generateRandomProblem = generateProblem;
 
 async function parseUploadedFile(file) {
   const fileName = file.name.toLowerCase();

@@ -114,21 +114,48 @@ body {
     gap: 6px;
 }
 
-.nav-right {
+.nav-left-group {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
-.back-app-link {
-    color: var(--subtext);
-    text-decoration: none;
+.back-app-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.85);
     font-size: 13px;
     font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
 }
 
-.back-app-link:hover {
-    color: var(--gold);
+.back-app-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.35);
+    color: var(--gold, #f0a500);
+}
+
+[data-theme="light"] .back-app-btn {
+    border-color: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+}
+
+[data-theme="light"] .back-app-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: var(--gold, #f0a500);
+    color: var(--gold, #f0a500);
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .logout-btn {
